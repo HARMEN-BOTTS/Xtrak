@@ -1,0 +1,39 @@
+.dl dt {
+float: left;
+/* width: 41%; */
+padding: 0!important;
+overflow: hidden;
+clear: left;
+text-align: right;
+text-overflow: ellipsis;
+white-space: nowrap;
+line-height: 1rem;
+font-size: .9em;
+}
+.dl dd {
+margin-left: 20%;
+line-height: 1rem;
+font-size: .9em;
+}
+
+.mecustom-card:hover {
+transform: scale(1.05);
+box-shadow: 0 0 10px #007bff;
+border-color: #007bff;
+}
+.mecustom-card{
+transition: 0.5s;
+cursor: pointer;
+}
+
+.bg-dash-sidebar{
+background-color: #6699FF;
+}
+
+.user-online {
+background-color: #67b173;
+}
+
+.user-offline {
+background-color: red;
+}
