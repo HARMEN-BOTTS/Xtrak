@@ -61,7 +61,7 @@ class ChatList extends Component
 {
     $this->isModalOpen = true;
 
-    if (auth()->user()->hasRole('Consultant')) {
+    if (auth()->user()->hasRole('CST')) {
 
         $this->users = User::where('id', '!=', $this->auth_id)
                            ->whereHas('roles', function($query) {
