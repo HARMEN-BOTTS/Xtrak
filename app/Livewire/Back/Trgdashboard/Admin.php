@@ -18,6 +18,9 @@ use App\Models\TrgCtcLink;
 use App\Models\Mcpdashboard;
 use App\Models\TrgMcpLink;
 
+// Event : 
+use App\Models\TrgEvent;
+
 class Admin extends Component
 {
     use WithPagination;
@@ -64,6 +67,11 @@ class Admin extends Component
     protected $rules_mcp = [
         'mcpCode' => 'required',
     ];
+
+    // Event : 
+
+    public $showEventModal = false;
+    public $eventFormData = [];
 
 
     public $showCheckboxes = false;
@@ -603,6 +611,242 @@ class Admin extends Component
         $this->closeMcpModal();
         $this->dispatch('closeModal', modalId: 'mcpLinkModal');
     }
+
+
+
+
+    // Event : 
+
+
+    // Add these methods
+    public function openEventModal()
+    {
+        if (empty($this->selectedRows)) {
+            $this->dispatch('alert', type: 'error', message: "Please select at least one row to create event");
+            return;
+        }
+
+        // Get the first selected row data to populate form
+        $selectedItem = Trgdashboard::find($this->selectedRows[0]);
+
+        if ($selectedItem) {
+            $this->eventFormData = [
+                'trg_id' => $selectedItem->id,
+                'trg_code' => $selectedItem->trg_code,
+                'company' => $selectedItem->company,
+                'ctc_code' => '', // You might need to get this from related data
+                'first_name' => $selectedItem->first_name,
+                'last_name' => $selectedItem->last_name,
+                'position' => $selectedItem->position,
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+                'retour' => ''
+            ];
+        }
+
+        $this->showEventModal = true;
+        $this->dispatch('open-event-modal');
+    }
+
+    public function closeEventModal()
+    {
+        $this->showEventModal = false;
+        $this->eventFormData = [];
+        $this->dispatch('close-event-modal');
+    }
+
+    public function saveEvent()
+    {
+        // $this->validate([
+        //     'eventFormData.event_date' => 'required|date',
+        //     'eventFormData.type' => 'required',
+        // ]);
+
+        TrgEvent::create([
+            'trg_id' => $this->eventFormData['trg_id'],
+            'event_date' => $this->eventFormData['event_date'],
+            'type' => $this->eventFormData['type'],
+            'io' => $this->eventFormData['io'],
+            'object' => $this->eventFormData['object'],
+            'status' => $this->eventFormData['status'],
+            'comment' => $this->eventFormData['comment'],
+            'next' => $this->eventFormData['next'],
+            'ech' => $this->eventFormData['ech'],
+            'priority' => $this->eventFormData['priority'],
+            'last_comment' => $this->eventFormData['last_comment'],
+            'date_last_comment' => $this->eventFormData['date_last_comment'],
+            'other_comment' => $this->eventFormData['other_comment'],
+            'note1' => $this->eventFormData['note1'],
+            'temper' => $this->eventFormData['temper'],
+            'retour' => $this->eventFormData['retour']
+        ]);
+
+        $this->dispatch('alert', type: 'success', message: "Event created successfully");
+        $this->closeEventModal();
+    }
+
+    public function showEventList()
+    {
+        if (empty($this->selectedRows)) {
+            // Show all events
+            redirect()->route('trgevtlist');
+            return;
+        }
+
+        $eventDataCount = TrgEvent::whereIn('trg_id', $this->selectedRows)->count();
+
+
+        if ($eventDataCount === 0) {
+            $this->dispatch('alert', type: 'error', message: "No event created for selected row");
+            return;
+        }
+
+        // Show events for selected rows
+        redirect()->route('trgevtlist', ['selectedRows' => $this->selectedRows]);
+    }
+
+    public function resetEventForm()
+    {
+        $selectedItem = null;
+        if (!empty($this->selectedRows)) {
+            $selectedItem = Trgdashboard::find($this->selectedRows[0]);
+        }
+
+        if ($selectedItem) {
+
+            $this->eventFormData = [
+                'trg_id' => $selectedItem->id,
+                'trg_code' => $selectedItem->trg_code,
+                'company' => $selectedItem->company,
+                'ctc_code' => '',
+                'first_name' => $selectedItem->first_name,
+                'last_name' => $selectedItem->last_name,
+                'position' => $selectedItem->position,
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+                'retour' => ''
+            ];
+        } else {
+            $this->eventFormData = [
+                'trg_id' => '',
+                'trg_code' => '',
+                'company' => '',
+                'ctc_code' => '',
+                'first_name' => '',
+                'last_name' => '',
+                'position' => '',
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+                'retour' => ''
+            ];
+        }
+
+        $this->dispatch('alert', type: 'info', message: "Form has been reset");
+        $this->dispatch('form-reset');
+    }
+
+
+    public function newEventForm()
+    {
+        $selectedItem = null;
+        if (!empty($this->selectedRows)) {
+            $selectedItem = Trgdashboard::find($this->selectedRows[0]);
+        }
+
+        if ($selectedItem) {
+
+            $this->eventFormData = [
+                'trg_id' => $selectedItem->id,
+                'trg_code' => $selectedItem->trg_code,
+                'company' => $selectedItem->company,
+                'ctc_code' => '',
+                'first_name' => $selectedItem->first_name,
+                'last_name' => $selectedItem->last_name,
+                'position' => $selectedItem->position,
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+                'retour' => ''
+            ];
+        } else {
+            $this->eventFormData = [
+                'trg_id' => '',
+                'trg_code' => '',
+                'company' => '',
+                'ctc_code' => '',
+                'first_name' => '',
+                'last_name' => '',
+                'position' => '',
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+                'retour' => ''
+            ];
+        }
+
+        $this->dispatch('alert', type: 'success', message: "New Event Form Opened");
+        $this->dispatch('form-reset');
+    }
+
+
 
 
 

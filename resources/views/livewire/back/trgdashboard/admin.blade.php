@@ -40,12 +40,25 @@
                             <div class="one">
                                 <button type="button" class="btn btn-opp" wire:click="openOppModal"><i class="fas fa-link"></i></button>
                             </div>
-                            <div class="one">
+
+                            <!-- <div class="one">
                                 <a href="/trgevtlist">
                                     <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
                                 </a>
-                                <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                            </div> -->
+
+                            <!-- Replace the existing buttons -->
+                            <div class="one">
+                                <button type="button" class="btn btn-evt" wire:click="showEventList()">
+                                    EVT<i style="margin-left:5px;" class="fa-regular fa-file-lines"></i>
+                                </button>
+                                <button type="button" class="btn btn-evt" wire:click="openEventModal()">
+                                    EVT<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i>
+                                </button>
                             </div>
+
+
                             <div class="two">
                                 <button id="ctclistButton"
                                     wire:click="showLinkedDataCTC"
@@ -397,10 +410,10 @@
 
 
 
-        <div id="evtModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 style="background:#FFB4A2;width:18%;padding:7px;text-align:center">TRG_EVTform</h2>
+        <div id="evtModal" class="modal1" style="display: {{ $showEventModal ? 'block' : 'none' }};">
+            <div class="modal-content1">
+                <div class="modal-header1">
+                    <h2 style="background:#FFB4A2;width:18%;padding:7px;text-align:center;">TRG_EVTform</h2>
                 </div>
                 <div class="icons-row">
                     <div class="icon-item">
@@ -431,79 +444,81 @@
                     <div class="form-row">
                         <div class="form-group statut-field">
                             <label>TRG_Code</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.trg_code" readonly>
                         </div>
                         <div class="form-group objet-field">
                             <label>Company</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.company" readonly>
                         </div>
                         <div class="form-group statut-field">
                             <label>CTC_Code</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.ctc_code">
                         </div>
                         <div class="form-group retour-field">
-                            <label>First Name </label>
-                            <input type="text" class="form-control1">
+                            <label>First Name</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.first_name" readonly>
                         </div>
                         <div class="form-group retour-field">
                             <label>Last Name</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.last_name" readonly>
                         </div>
                         <div class="form-group statut-field">
                             <label>Function</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.position" readonly>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group date-field">
                             <label>Date</label>
-                            <input type="date" class="form-control1" value="">
+                            <input type="date" class="form-control1" wire:model="eventFormData.event_date">
                         </div>
                         <div class="form-group type-field">
                             <label>Type</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.type">
                         </div>
                         <div class="form-group io-field">
                             <label>I/O</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.io">
                         </div>
                         <div class="form-group objet-field">
                             <label>Objet</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.object">
                         </div>
                         <div class="form-group statut-field">
                             <label>Statut</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.status">
                         </div>
                         <div class="form-group retour-field">
                             <label>Retour</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.retour">
                         </div>
                         <div class="form-group statut-field">
                             <label>Temper</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.temper">
                         </div>
                     </div>
+
+
 
                     <div class="comment-section">
                         <div class="form-group comment-field">
                             <label>Comment</label>
                             <!-- <textarea class="form-control2"></textarea> -->
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.comment">
                         </div>
                         <div class="right-section">
                             <div class="next-ech-row">
                                 <div class="form-group next-field">
                                     <label>Next</label>
-                                    <input type="text" class="form-control1">
+                                    <input type="text" class="form-control1" wire:model="eventFormData.next">
                                 </div>
                                 <div class="form-group ech-field">
                                     <label>Ech</label>
-                                    <input type="text" class="form-control1">
+                                    <input type="text" class="form-control1" wire:model="eventFormData.ech">
                                 </div>
                                 <div class="form-group ech-field">
                                     <label>Priority</label>
-                                    <input type="text" class="form-control1">
+                                    <input type="text" class="form-control1" wire:model="eventFormData.priority">
                                 </div>
                             </div>
                         </div>
@@ -514,39 +529,39 @@
                     <div class="comment-section">
                         <div class="form-group retour-field">
                             <label>Last Comment</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.last_comment">
                         </div>
                         <div class="right-section">
                             <div class="next-ech-row">
                                 <div class="form-group last-field">
                                     <label>Date Last Com.</label>
-                                    <input type="text" class="form-control1">
+                                    <input type="date" class="form-control1" wire:model="eventFormData.date_last_comment">
                                 </div>
                             </div>
 
                         </div>
                         <div class="form-group">
                             <label>Other Comment</label>
-                            <textarea class="form-control1"></textarea>
+                            <textarea class="form-control1" wire:model="eventFormData.other_comment"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Note1</label>
-                            <textarea class="form-control1"></textarea>
+                            <textarea class="form-control1" wire:model="eventFormData.note1"></textarea>
                         </div>
                     </div>
 
                     <div class="button-group">
                         <div class="button-group-left">
                             <div class="one">
-                                <button type="button" class="btn btn-evt">EVTlist</button>
-                                <button type="button" class="btn btn-evt"> > New</button>
+                                <button type="button" class="btn btn-evt" wire:click="showEventList()">EVTlist</button>
+                                <button type="button" class="btn btn-evt" wire:click="newEventForm"> > New</button>
                             </div>
                             <div class="two">
-                                <button type="button" class="btn btn-valid">Valid</button>
-                                <button type="button" class="btn btn-inputmain">Input</button>
+                                <!-- <button type="button" class="btn btn-valid">Valid</button> -->
+                                <button type="button" class="btn btn-inputmain" wire:click="saveEvent()">Save</button>
                             </div>
                             <div class="three">
-                                <button type="button" class="btn btn-erase" onclick="eraseForms()">Erase</button>
+                                <button type="button" class="btn btn-erase" wire:click="resetEventForm">Erase</button>
                                 <button type="button" class="btn btn-close1" onclick="closeModal()">Close</button>
                             </div>
                         </div>
@@ -636,7 +651,7 @@
                 color: white;
             }
 
-            
+
 
             .modal-overlay {
                 position: fixed;
@@ -659,15 +674,15 @@
             }
 
 
-            /* 
-            .modal-content {
+
+            .modal-content1 {
                 background: none;
                 border-radius: 8px;
                 width: 300px;
                 text-align: left;
             }
 
-            .modal {
+            .modal1 {
                 display: none;
                 position: fixed;
                 top: 0;
@@ -678,7 +693,7 @@
                 z-index: 1050;
             }
 
-            .modal-content {
+            .modal-content1 {
                 position: relative;
                 background-color: #fff;
                 margin: 5% auto;
@@ -690,22 +705,22 @@
             }
 
 
-            .modal-header {
-                margin-bottom: 5px;
+            .modal-header1 {
+                margin-bottom: 8px;
                 margin-left: -12px;
             }
 
-            .modal-header h2 {
+            .modal-header1 h2 {
                 color: #333;
                 font-size: 1.4em;
                 font-weight: 500;
                 margin-right: 10px;
-            } */
+            }
 
             .icons-row {
                 display: flex;
                 gap: 25px;
-                margin-top: 5px;
+                margin-top: 10px;
                 margin-bottom: -20px;
                 padding-left: 5px;
             }

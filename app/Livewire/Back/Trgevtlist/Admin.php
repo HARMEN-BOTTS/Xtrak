@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Back\Trgevtlist;
 
-use App\Models\Trgdashboard;
+use App\Models\TrgEvent;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -13,6 +13,8 @@ class Admin extends Component
     public $sortField = 'updated_at';
     public $sortDirection = 'desc';
     public $selectAll = false;
+    public $selectedRows = [];
+    
 
     public function sortBy($field)
     {
@@ -26,13 +28,38 @@ class Admin extends Component
         $this->resetPage();
     }
 
+
+    public function mount()
+    {
+        $this->selectedRows = request()->get('selectedRows', []);
+        
+    }
+
     public function render()
     {
-        $data = Trgdashboard::orderBy($this->sortField, $this->sortDirection)
+        $query = TrgEvent::with('trgDashboard');
+
+        if (!empty($this->selectedRows)) {
+            $query->whereIn('trg_id', $this->selectedRows);
+        }
+
+        $data = $query->orderBy($this->sortField, $this->sortDirection)
             ->paginate(100);
 
         return view('livewire.back.trgevtlist.admin', [
             'data' => $data
         ]);
     }
+
+    // public function render()
+    // {
+    //     $data = Trgdashboard::orderBy($this->sortField, $this->sortDirection)
+    //         ->paginate(100);
+
+    //     return view('livewire.back.trgevtlist.admin', [
+    //         'data' => $data
+    //     ]);
+    // }
 }
+
+
