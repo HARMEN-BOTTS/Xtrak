@@ -1,12 +1,12 @@
 <div>
-     @include('components.breadcrumb', [
+    @include('components.breadcrumb', [
     'title' => 'Nouvelle saisie',
     'breadcrumbItems' => [
-    ['text' => 'ADM', 'url' => ''] ,['text' => 'Landing', 'url' => '/landing'] ,['text' => 'Forms', 'url' => ''] ,['text' => 'RTform', 'url' => '/rtform']
+    ['text' => 'ADM', 'url' => ''] ,['text' => 'Landing', 'url' => '/landing'] ,['text' => 'Forms', 'url' => ''] ,['text' => 'XTKform', 'url' => '/rtform']
     ],
     ])
     <div class="row">
-         <div style="margin-top: -1%;margin-left:-10px;" class="p-2 mb-3 d-flex justify-content-between">
+        <div style="margin-top: -1%;margin-left:-10px;" class="p-2 mb-3 d-flex justify-content-between">
             <div>
             </div>
             <div>
@@ -34,9 +34,9 @@
                     <form wire:submit.prevent="save">
                         <div class="button-group">
                             <div class="button-group-left">
-                                <h5 style="margin-left:-22px; background-color:red; border-radius:5px; color:white;padding:12px;margin-top:-2px">RTform</h5>
+                                <h5 style="margin-left:-22px; background-color:red; border-radius:5px; color:white;padding:12px;margin-top:-2px">XTKform</h5>
                                 <a href="/rtform">
-                                    <button type="button" class="btn btn-danger">RT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                    <button type="button" class="btn btn-danger">XTK <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
                                 </a>
                                 <div class="one">
                                     <a href="">
@@ -64,27 +64,42 @@
                                 @error('date_rt') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="form-group objet-field">
-                                <label>Auth.</label>
+                                <label>From</label>
                                 <select class="form-control1" wire:model="auth">
                                     <option value="">Select</option>
-                                    <option value="ADM">ADM</option>
-                                    <option value="MGR">MGR</option>
-                                    <option value="CST">CST</option>
+                                    <option value="ADM">BGS</option>
+                                    <option value="MGR">NKH</option>
+                                    <option value="CST">PJW</option>
                                 </select>
                             </div>
                             <div class="form-group objet-field">
-                                <label>Tskcode</label>
+                                <label>Task code</label>
                                 <input type="text" class="form-control1" wire:model="task_code">
                                 @error('task_code') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="form-group objet-field">
-                                <label>Dest.</label>
-                                <input type="text" class="form-control1" wire:model="destination">
-                                @error('destination') <span class="text-danger">{{ $message }}</span> @enderror
+                                <label>To</label>
+                                <select class="form-control1" wire:model="destination">
+                                    <option value="">Select</option>
+                                    <option value="ADM">BGS</option>
+                                    <option value="MGR">NKH</option>
+                                    <option value="CST">PJW</option>
+                                </select>
                             </div>
                             <div class="form-group objet-field">
+                                <!-- <label>Type Input</label>
+                                <input type="text" class="form-control1" wire:model="type_input"> -->
                                 <label>Type Input</label>
-                                <input type="text" class="form-control1" wire:model="type_input">
+                                <select class="form-control1" wire:model="type_input">
+                                    <option value="">Select</option>
+                                    <option value="Improve">Improve</option>
+                                    <option value="Bug">Bug</option>
+                                    <option value="Correc">Correc</option>
+                                    <option value="Error">Error</option>
+                                    <option value="Evolution">Evolution</option>
+                                    <option value="Upgrade">Upgrade</option>
+                                    <option value="Fix">Fix</option>
+                                </select>
                             </div>
                             <div class="form-group objet-field">
                                 <label>Subject</label>
@@ -465,7 +480,7 @@
         }
 
         .btn-valid:hover {
-            background-color:#00CCDD;
+            background-color: #00CCDD;
             color: white;
         }
 
