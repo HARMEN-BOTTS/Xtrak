@@ -50,9 +50,10 @@
                                 <button type="button" class="btn btn-outline-danger me-2" wire:click="resetForm"><i class="fa-solid fa-eraser"></i></button>
                                 <button type="button" style="background:red;" class="btn btn-danger"><i class="fa-regular fa-trash-can fa-lg"></i></button>
                                 <button type="submit" class="btn btn-success me-2"><i class="fa-regular fa-floppy-disk"></i></button>
-                                <a href="/landing" class="btn btn-secondary"><i class="fas fa-times"></i></a>
-
-                       
+                                <button onclick="history.back()" type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+                                <a href="/mcpdashboard">
+                                    <button style="border-radius: 50%;" type="button" class="btn btn-close1"><i class="fa-solid fa-arrow-left"></i></button>
+                                </a>
                             </div>
                         </div>
 
@@ -117,7 +118,7 @@
                                 <select class="form-select" wire:model="from" wire:change="fetchPasscode">
                                     <option value="">Select Email</option>
                                     @foreach($mailOptions as $mail)
-                                        <option value="{{ $mail->email }}">{{ $mail->email }}</option>
+                                    <option value="{{ $mail->email }}">{{ $mail->email }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -199,10 +200,10 @@
                             <div class="mt-3">
                                 <button type="button" class="btn btn-info" wire:click="generatePreview">Preview First Email</button>
                                 @if($previewMessage)
-                                    <div class="mt-3 p-3 border bg-light">
-                                        <h5>Preview for: {{ $previewRecipientEmail }}</h5>
-                                        <pre style="white-space: pre-wrap;">{!! nl2br(e($previewMessage)) !!}</pre>
-                                    </div>
+                                <div class="mt-3 p-3 border bg-light">
+                                    <h5>Preview for: {{ $previewRecipientEmail }}</h5>
+                                    <pre style="white-space: pre-wrap;">{!! nl2br(e($previewMessage)) !!}</pre>
+                                </div>
                                 @endif
                             </div>
                         </div>

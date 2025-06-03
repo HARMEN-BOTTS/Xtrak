@@ -6,7 +6,7 @@
     ],
     ])
     <div class="row">
-         <div style="margin-top: -1%;margin-left:-10px;" class="p-2 mb-3 d-flex justify-content-between">
+        <div style="margin-top: -1%;margin-left:-10px;" class="p-2 mb-3 d-flex justify-content-between">
             <div>
             </div>
             <div>
@@ -64,9 +64,9 @@
                                     <button style="background:red;" wire:click="" class="btn btn-danger" id="delete-button-container">
                                         <i class="fa-regular fa-trash-can fa-lg"></i>
                                     </button>
-                                    <button type="submit" class="btn btn-valid"><i class="fa-regular fa-floppy-disk fa-lg"></i></button>
-                                    <a href="/landing">
-                                        <button type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+                                    <button onclick="history.back()" type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+                                    <a href="/cstdashboard">
+                                        <button style="border-radius: 50%;" type="button" class="btn btn-close1"><i class="fa-solid fa-arrow-left"></i></button>
                                     </a>
                                 </div>
 

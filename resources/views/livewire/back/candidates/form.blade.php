@@ -137,8 +137,10 @@
                                                         <span class="spinner-border spinner-border-sm" role="status"
                                                             aria-hidden="true"></span>
                                                     </button>
-                                                    <a href="/landing">
-                                                        <button type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+                                                    <button onclick="history.back()" type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+
+                                                    <a href="/dashboard">
+                                                        <button style="border-radius: 50%;" type="button" class="btn btn-close1"><i class="fa-solid fa-arrow-left"></i></button>
                                                     </a>
                                                 </div>
                                             </div>
@@ -1521,7 +1523,7 @@
 
     .button-group-left-main {
         display: flex;
-        gap: 40px;
+        gap: 30px;
     }
 
     .button-group {
