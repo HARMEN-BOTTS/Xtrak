@@ -35,10 +35,26 @@ class SendBatchEmails implements ShouldQueue
         $this->attachmentPaths = $attachmentPaths;
         $this->sender = $sender;
         $this->appPassword = $appPassword;
-        $this->batchMin = $batchMin;
-        $this->batchMax = $batchMax;
-        $this->pauseMin = $pauseMin;
-        $this->pauseMax = $pauseMax;
+        // $this->batchMin = $batchMin;
+        // $this->batchMax = $batchMax;
+        // $this->pauseMin = $pauseMin;
+        // $this->pauseMax = $pauseMax;
+
+        // Set default values if batch parameters are empty/null
+        $this->batchMin = !empty($batchMin) && is_numeric($batchMin) ? (int)$batchMin : 1;
+        $this->batchMax = !empty($batchMax) && is_numeric($batchMax) ? (int)$batchMax : 10;
+        $this->pauseMin = !empty($pauseMin) && is_numeric($pauseMin) ? (int)$pauseMin : 1;
+        $this->pauseMax = !empty($pauseMax) && is_numeric($pauseMax) ? (int)$pauseMax : 5;
+
+        // Ensure batchMin is not greater than batchMax
+        if ($this->batchMin > $this->batchMax) {
+            $this->batchMin = $this->batchMax;
+        }
+
+        // Ensure pauseMin is not greater than pauseMax
+        if ($this->pauseMin > $this->pauseMax) {
+            $this->pauseMin = $this->pauseMax;
+        }
     }
 
     /**
@@ -67,7 +83,7 @@ class SendBatchEmails implements ShouldQueue
                 $paragraphs = preg_split('/\R\R+/', trim($personalized));
                 $formattedHtml = '';
                 foreach ($paragraphs as $para) {
-                    $formattedHtml .= '<p>' . nl2br(e(trim($para))) . '</p>';
+                    $formattedHtml .= '<p>' . nl2br(trim($para)) . '</p>';
                 }
 
                 // 3. Add embedded logo and footer signature (via cid)
@@ -86,5 +102,4 @@ class SendBatchEmails implements ShouldQueue
             sleep(rand($this->pauseMin, $this->pauseMax));
         }
     }
-
 }
