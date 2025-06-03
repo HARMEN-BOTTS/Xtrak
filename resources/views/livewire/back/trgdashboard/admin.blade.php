@@ -444,11 +444,11 @@
                     <div class="form-row">
                         <div class="form-group statut-field">
                             <label>TRG_Code</label>
-                            <input type="text" class="form-control1" wire:model="eventFormData.trg_code" readonly>
+                            <input type="text" class="form-control1" wire:model="eventFormData.trg_code">
                         </div>
                         <div class="form-group objet-field">
                             <label>Company</label>
-                            <input type="text" class="form-control1" wire:model="eventFormData.company" readonly>
+                            <input type="text" class="form-control1" wire:model="eventFormData.company">
                         </div>
                         <div class="form-group statut-field">
                             <label>CTC_Code</label>
@@ -456,15 +456,15 @@
                         </div>
                         <div class="form-group retour-field">
                             <label>First Name</label>
-                            <input type="text" class="form-control1" wire:model="eventFormData.first_name" readonly>
+                            <input type="text" class="form-control1" wire:model="eventFormData.first_name">
                         </div>
                         <div class="form-group retour-field">
                             <label>Last Name</label>
-                            <input type="text" class="form-control1" wire:model="eventFormData.last_name" readonly>
+                            <input type="text" class="form-control1" wire:model="eventFormData.last_name">
                         </div>
                         <div class="form-group statut-field">
                             <label>Function</label>
-                            <input type="text" class="form-control1" wire:model="eventFormData.position" readonly>
+                            <input type="text" class="form-control1" wire:model="eventFormData.position">
                         </div>
                     </div>
                     <div class="form-row">
@@ -554,7 +554,9 @@
                         <div class="button-group-left">
                             <div class="one">
                                 <button type="button" class="btn btn-evt" wire:click="showEventList()">EVTlist</button>
-                                <button type="button" class="btn btn-evt" wire:click="newEventForm"> > New</button>
+                                <a href="/trgdashboard">
+                                    <button type="button" class="btn btn-evt"> > New</button>
+                                </a>
                             </div>
                             <div class="two">
                                 <!-- <button type="button" class="btn btn-valid">Valid</button> -->
@@ -562,7 +564,7 @@
                             </div>
                             <div class="three">
                                 <button type="button" class="btn btn-erase" wire:click="resetEventForm">Erase</button>
-                                <button type="button" class="btn btn-close1" onclick="closeModal()">Close</button>
+                                <button type="button" class="btn btn-close1" wire:click="closeEventModal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -1116,13 +1118,13 @@
         }
 
 
-        function openModal() {
-            document.getElementById('evtModal').style.display = 'block';
-        }
+        // function openModal() {
+        //     document.getElementById('evtModal').style.display = 'block';
+        // }
 
-        function closeModal() {
-            document.getElementById('evtModal').style.display = 'none';
-        }
+        // function closeModal() {
+        //     document.getElementById('evtModal').style.display = 'none';
+        // }
 
         function eraseForm() {
             const modal = document.getElementById('evtForm');
@@ -1133,12 +1135,12 @@
         }
 
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('evtModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
+        // window.onclick = function(event) {
+        //     const modal = document.getElementById('evtModal');
+        //     if (event.target === modal) {
+        //         closeModal();
+        //     }
+        // }
 
         document.getElementById('evtForm').addEventListener('submit', function(e) {
             e.preventDefault();
