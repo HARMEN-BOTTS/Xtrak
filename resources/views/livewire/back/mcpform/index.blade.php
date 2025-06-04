@@ -213,7 +213,9 @@
                                 @if($previewMessage)
                                 <div class="mt-3 p-3 border bg-light">
                                     <h5>Preview for: {{ $previewRecipientEmail }}</h5>
-                                    <pre style="white-space: pre-wrap;">{!! nl2br(e($previewMessage)) !!}</pre>
+                                    <div style="border: 1px solid #ddd; padding: 15px; background-color: white; font-family: Arial, sans-serif; line-height: 1.4;">
+                                        {!! $previewMessage !!}
+                                    </div>
                                 </div>
                                 @endif
                             </div>

@@ -328,6 +328,13 @@ class Index extends Component
     }
 
 
+
+
+
+
+
+
+
     public $previewMessage = '';
     public $previewRecipientEmail = '';
 
@@ -340,9 +347,29 @@ class Index extends Component
         $messageTemplate = '';
         foreach ($doc->getSections() as $section) {
             foreach ($section->getElements() as $element) {
-                $messageTemplate .= method_exists($element, 'getText') ? $element->getText() . "\n" : '';
+                if (method_exists($element, 'getText')) {
+                    $text = $element->getText();
+                    if (!empty(trim($text))) {
+                        $messageTemplate .= $text . "\n\n"; // Add double line breaks between elements
+                    }
+                }
+                // Also check for TextRun elements which might contain the actual paragraphs
+                elseif (method_exists($element, 'getElements')) {
+                    foreach ($element->getElements() as $subElement) {
+                        if (method_exists($subElement, 'getText')) {
+                            $text = $subElement->getText();
+                            if (!empty(trim($text))) {
+                                $messageTemplate .= $text . "\n\n";
+                            }
+                        }
+                    }
+                }
             }
         }
+
+        // Clean up extra line breaks
+        $messageTemplate = preg_replace('/\n{3,}/', "\n\n", trim($messageTemplate));
+
 
         // 2. Read recipients Excel
         $spreadsheet = IOFactory::load(storage_path('app/public/' . $this->recip_list_path->store('temp/recip_preview', 'public')));
@@ -365,17 +392,202 @@ class Index extends Component
                 // If filtering by specific email
                 if ($targetEmail && $data['email'] !== $targetEmail) continue;
 
-                $this->previewMessage = str_replace(
+                // 3. Personalize the message
+                $personalizedMessage = str_replace(
                     ['{civility}', '{firstName}', '{lastName}', '{domain}'],
                     [$data['civility'] ?? '', $data['first_name'] ?? '', $data['last_name'] ?? '', $data['domain'] ?? ''],
                     $messageTemplate
                 );
 
+                // 4. Process with same HTML formatting as email job
+                $this->previewMessage = $this->processWordDocContentForPreview($personalizedMessage);
                 $this->previewRecipientEmail = $data['email'];
                 break;
             }
         }
     }
+
+    private function processWordDocContentForPreview($content)
+    {
+        // Same processing as in SendBatchEmails job
+        $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+
+        $content = str_replace([
+            '&#039;',
+            '&quot;',
+            '&amp;',
+            '&lt;',
+            '&gt;',
+            '\\"',
+            "\\'",
+            '\\n',
+            '\\r',
+            '\\t'
+        ], [
+            "'",
+            '"',
+            '&',
+            '<',
+            '>',
+            '"',
+            "'",
+            "\n",
+            "\r",
+            "\t"
+        ], $content);
+
+        $content = preg_replace([
+            '/[\x{2018}\x{2019}]/u',
+            '/[\x{201C}\x{201D}]/u',
+            '/\x{2026}/u',
+            '/[\x{2013}\x{2014}]/u'
+        ], [
+            "'",
+            '"',
+            '...',
+            '-'
+        ], $content);
+
+        if (preg_match('/(We Chase Talents For Industry|Barthélemy GILLES).*$/s', $content, $matches)) {
+            $mainContent = substr($content, 0, strpos($content, $matches[0]));
+            $signatureBlock = $matches[0];
+
+            $mainHtml = $this->processMainContentForPreview($mainContent);
+            $signatureHtml = $this->processSignatureBlockForPreview($signatureBlock);
+
+            return $mainHtml . $signatureHtml;
+        }
+
+        return $this->processMainContentForPreview($content);
+    }
+
+    private function processMainContentForPreview($content)
+    {
+        $lines = explode("\n", $content);
+        $formattedHtml = '<div style="margin: 0; padding: 0; line-height: 1.4;">';
+        $inList = false;
+        $currentParagraph = '';
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            if (empty($line)) {
+                if ($inList) {
+                    $formattedHtml .= '</ul>';
+                    $inList = false;
+                } elseif (!empty($currentParagraph)) {
+                    $formattedHtml .= '<p style="margin: 0 0 10px 0; padding: 0; line-height: 1.4;">' . $this->formatTextForPreview($currentParagraph) . '</p>';
+                    $currentParagraph = '';
+                }
+                continue;
+            }
+
+            if (preg_match('/^[-*•·]\s+(.*)/', $line, $matches)) {
+                if (!empty($currentParagraph)) {
+                    $formattedHtml .= '<p style="margin: 0 0 10px 0; padding: 0; line-height: 1.4;">' . $this->formatTextForPreview($currentParagraph) . '</p>';
+                    $currentParagraph = '';
+                }
+
+                if (!$inList) {
+                    $formattedHtml .= '<ul style="margin: 0 0 10px 0; padding-left: 20px;">';
+                    $inList = true;
+                }
+
+                $listItem = $this->formatTextForPreview($matches[1]);
+                $formattedHtml .= '<li style="margin: 0; padding: 0;">' . $listItem . '</li>';
+            } else {
+                if ($inList) {
+                    $formattedHtml .= '</ul>';
+                    $inList = false;
+                }
+
+                if (!empty($currentParagraph)) {
+                    $currentParagraph .= ' ' . $line;
+                } else {
+                    $currentParagraph = $line;
+                }
+            }
+        }
+
+        if ($inList) {
+            $formattedHtml .= '</ul>';
+        } elseif (!empty($currentParagraph)) {
+            $formattedHtml .= '<p style="margin: 0 0 10px 0; padding: 0; line-height: 1.4;">' . $this->formatTextForPreview($currentParagraph) . '</p>';
+        }
+
+        $formattedHtml .= '</div>';
+        return $formattedHtml;
+    }
+
+    private function processSignatureBlockForPreview($content)
+    {
+        $html = '<p>';
+
+        if (stripos($content, 'Bien à vous') !== false) {
+            $html .= 'Bien à vous,<br>';
+        }
+
+        $html .= '<br>';
+        $html .= '<strong style="color:#161179;">Barthélemy GILLES</strong><br>';
+
+        if (stripos($content, 'PH Div. Manager') !== false) {
+            $html .= '<span style="color:#161179;">PH Div. Manager<br>Cell : 06 88 38 63 62</span>';
+        }
+
+        $html .= '<br>';
+
+        $html .= '<img src="https://mail.google.com/mail/u/0?ui=2&ik=ba40943ee4&attid=0.1&permmsgid=msg-f:1834025678819356517&th=1973c4a346f8ef65&view=fimg&fur=ip&permmsgid=msg-f:1834025678819356517&sz=s0-l75-ft&attbid=ANGjdJ8vcZojToE387HMzqNJgznXrBe5PLYsrrvz99-781TrKJO7sCv-eV01icxbInIMAfV9zi1CtFUvtxo8mUr3f4GPB33alhvshPg_n4UaPnXmOUxioWaKuPj27C8&disp=emb&zw" alt="Harmen & Botts Logo" style="height:40px; margin:10px 0;"><br>';
+
+
+        // For preview, show placeholder instead of actual logo
+        // $html .= '<div style="background-color: #f0f0f0; border: 1px dashed #ccc; padding: 10px; text-align: center; margin: 10px 0; font-style: italic; color: #666;">Logo will appear here in actual email</div>';
+
+        $html .= '<strong style="color:#161179;"><em>We Chase Talents For Industry</em></strong><br>';
+
+        if (stripos($content, 'Avenue du Roule') !== false) {
+            $html .= '<span style="color:#161179;">37, Avenue du Roule<br></span>';
+        }
+
+        if (stripos($content, 'Neuilly-sur-Seine') !== false) {
+            $html .= '<span style="color:#161179;">92200 Neuilly-sur-Seine<br>Std : 01 84 20 46 49<br></span>';
+        }
+
+        $html .= '<a style="color:#161179;" href="http://www.harmen-botts.com">www.harmen-botts.com</a>';
+        $html .= '</p>';
+
+        return $html;
+    }
+
+    private function formatTextForPreview($text)
+    {
+        $text = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $text);
+        $text = preg_replace('/__(.*?)__/', '<strong>$1</strong>', $text);
+        $text = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $text);
+        $text = preg_replace('/_(.*?)_/', '<em>$1</em>', $text);
+
+        $text = preg_replace('/\[(.*?)\]\{\.underline\}/', '<u>$1</u>', $text);
+
+        // Updated patterns with dash prefix
+        $boldPatterns = [
+            'Nous couvrons la totalité des métiers' => '- <strong>Nous couvrons la totalité des métiers</strong>',
+            'Nous sommes rapides et agiles' => '- <strong>Nous sommes rapides et agiles</strong>',
+            'Nous sommes rigoureux et déterminés' => '- <strong>Nous sommes rigoureux et déterminés</strong>',
+            'Nous développons nos propres solutions' => '- <strong>Nous développons nos propres solutions</strong>',
+            'Barthélemy GILLES' => '<strong>Barthélemy GILLES</strong>'
+        ];
+
+        foreach ($boldPatterns as $pattern => $replacement) {
+            $text = str_replace($pattern, $replacement, $text);
+        }
+
+        $text = str_replace('Ce qui nous caractérise', '<u>Ce qui nous caractérise</u>', $text);
+
+        return $text;
+    }
+
+
+
+
 
 
 
