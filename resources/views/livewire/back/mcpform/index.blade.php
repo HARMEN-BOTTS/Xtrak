@@ -78,7 +78,7 @@
 
                             <!-- Additional Details -->
                             <div class="col-md-4">
-                                <label class="form-label">Tag Source</label>
+                                <label class="form-label">OPPcode</label>
                                 <input type="text" class="form-control" wire:model="tag_source">
                             </div>
                             <div class="col-md-4">
@@ -139,7 +139,7 @@
                                 <input type="datetime-local" class="form-control" wire:model="launch_date">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Pause Time (Min - Max in sec)</label>
+                                <label class="form-label">Mail Pause Time (in sec)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" wire:model="pause_min" placeholder="Min">
                                     <input type="number" class="form-control" wire:model="pause_max" placeholder="Max">
@@ -153,7 +153,14 @@
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Work Time (HH:MM - HH:MM)</label>
+                                <label class="form-label">Batch Pause Time(in min)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" wire:model="" placeholder="Min">
+                                    <input type="number" class="form-control" wire:model="" placeholder="Max">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Work Time (hh:mm - hh:mm)</label>
                                 <div class="input-group">
                                     <input type="time" class="form-control" wire:model="work_time_start">
                                     <input type="time" class="form-control" wire:model="work_time_end">
@@ -178,6 +185,10 @@
                                     <option>Paused</option>
                                     <option>Cancelled</option>
                                 </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Status Date</label>
+                                <input type="datetime-local" class="form-control" wire:model="">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Target Status</label>

@@ -194,18 +194,19 @@
                                     <th class="date_col" scope="col" wire:click="sortBy('updated_at')" style="background-color: #7D0A0A;">
                                         Date
                                     </th>
-                                    <th class="libe_col" scope="col" style="background-color: #7D0A0A;">Code</th>
+                                    <th class="libe_col" scope="col" style="background-color: #7D0A0A;">CodeMCP</th>
                                     <th class="cpdpt_col" scope="col" style="background-color: #7D0A0A;">Designation</th>
+                                    <th class="soci_col" scope="col" wire:click="sortBy('last_name')" style="background-color: #7D0A0A;">
+                                        OPPCode
+                                    </th>
                                     <th class="soci_col" scope="col" wire:click="sortBy('first_name')" style="background-color: #7D0A0A;">
                                         Object
                                     </th>
-                                    <th class="soci_col" scope="col" wire:click="sortBy('last_name')" style="background-color: #7D0A0A;">
-                                        Tag Source
-                                    </th>
-                                    <th class="ville_col" scope="col" style="background-color: #7D0A0A;">Message</th>
+
+                                    <th class="ville_col" scope="col" style="background-color: #7D0A0A;">Status</th>
                                     <th class="ref_col" scope="col" style="background-color: #7D0A0A;">Tool</th>
                                     <th class="cpdpt_col" scope="col" style="background-color: #7D0A0A;">Remarks</th>
-                                    <th class="reg_col" scope="col" style="background-color:#7D0A0A;">Notes</th>
+                                    <!-- <th class="reg_col" scope="col" style="background-color:#7D0A0A;">Notes</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -227,12 +228,12 @@
                                     <td>{{ $item->date_mcp }}</td>
                                     <td>{{ $item->mcp_code }}</td>
                                     <td>{{ $item->designation }}</td>
-                                    <td>{{ $item->object }}</td>
                                     <td>{{ $item->tag_source }}</td>
-                                    <td>{{ $item->message }}</td>
+                                    <td>{{ $item->object }}</td>
+                                    <td>{{ $item->status }}</td>
                                     <td>{{ $item->tool }}</td>
                                     <td>{{ $item->remarks }}</td>
-                                    <td>{{ $item->notes }}</td>
+                                    <!-- <td>{{ $item->notes }}</td> -->
                                 </tr>
                                 @endforeach
                                 @else

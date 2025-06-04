@@ -163,7 +163,6 @@ class Index extends Component
                 ]);
 
                 $this->dispatch('alert', type: 'success', message: "Record updated successfully!");
-   
             }
         } else {
             if (!Storage::disk('public')->exists('mcp/recipients')) {
@@ -281,7 +280,7 @@ class Index extends Component
             $zip->close();
 
 
-            
+
             // var_dump($recipients); 
             // dd($recipients); 
             // var_dump($text);
@@ -320,10 +319,8 @@ class Index extends Component
                 $this->pause_max
             ))->delay($launchTime);
 
-            session()->flash('message', 'Form submitted and email campaign scheduled ✅');
-    
-
-
+            // session()->flash('message', 'Form submitted and email campaign scheduled ✅');
+            $this->dispatch('alert', type: 'success', message: "Form submitted and email campaign scheduled");
         }
 
         $this->resetForm();
@@ -408,10 +405,30 @@ class Index extends Component
     public function resetForm()
     {
         $this->reset([
-            'date_mcp', 'mcp_code', 'designation', 'object', 'tag_source', 'message', 'tool',
-            'recip_list_path', 'message_doc', 'attachments',
-            'from', 'subject', 'launch_date', 'pause_min', 'pause_max', 'batch_min', 'batch_max',
-            'work_time_start', 'work_time_end', 'ref_time', 'status', 'target_status', 'remarks', 'notes'
+            'date_mcp',
+            'mcp_code',
+            'designation',
+            'object',
+            'tag_source',
+            'message',
+            'tool',
+            'recip_list_path',
+            'message_doc',
+            'attachments',
+            'from',
+            'subject',
+            'launch_date',
+            'pause_min',
+            'pause_max',
+            'batch_min',
+            'batch_max',
+            'work_time_start',
+            'work_time_end',
+            'ref_time',
+            'status',
+            'target_status',
+            'remarks',
+            'notes'
         ]);
 
         $this->isEditing = false;
@@ -424,5 +441,3 @@ class Index extends Component
         return view('livewire.back.mcpform.index');
     }
 }
-
-
