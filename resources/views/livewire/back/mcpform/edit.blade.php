@@ -68,7 +68,7 @@
                                 <input type="date" class="form-control" wire:model="formData.date_mcp">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">MCP Code</label>
+                                <label class="form-label">MCP code</label>
                                 <input type="text" class="form-control" wire:model="formData.mcp_code" readonly>
                             </div>
                             <div class="col-md-3">
@@ -100,11 +100,11 @@
 
                             <!-- File Uploads -->
                             <div class="col-md-4">
-                                <label class="form-label">Recipient List (Excel/CSV)</label>
+                                <label class="form-label">Recipient list (Excel/CSV)</label>
                                 <input type="file" class="form-control" wire:model="formData.recip_list_path">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Message Document (docx/pdf)</label>
+                                <label class="form-label">Message (docx/pdf)</label>
                                 <input type="file" class="form-control" wire:model="formData.message_doc">
                             </div>
                             <div class="col-md-4">
@@ -118,7 +118,7 @@
                                 <input type="email" class="form-control" wire:model="formData.from">
                             </div> -->
                             <div class="col-md-6">
-                                <label class="form-label">From (Sender Email)</label>
+                                <label class="form-label">From (sender Email)</label>
                                 <select class="form-select" wire:model="formData.from">
                                     <!-- <option value="">Select Email</option> -->
                                     <option value="bgilles@harmen-botts.com">bgilles@harmen-botts.com</option>
@@ -138,32 +138,32 @@
 
                             <!-- Schedule Settings -->
                             <div class="col-md-3">
-                                <label class="form-label">Launch Date</label>
+                                <label class="form-label">Launch date</label>
                                 <input type="datetime-local" class="form-control" wire:model="formData.launch_date">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Mail Pause Time (in sec)</label>
+                                <label class="form-label">Mail pause time (sec)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" wire:model="formData.pause_min" placeholder="Min">
                                     <input type="number" class="form-control" wire:model="formData.pause_max" placeholder="Max">
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Batch Size (Min - Max)</label>
+                                <label class="form-label">Batch Size (min - max)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" wire:model="formData.batch_min" placeholder="Min">
                                     <input type="number" class="form-control" wire:model="formData.batch_max" placeholder="Max">
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Batch Pause Time(in min)</label>
+                                <label class="form-label">Batch Pause (min)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" wire:model="formData." placeholder="Min">
                                     <input type="number" class="form-control" wire:model="formData." placeholder="Max">
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Work Time (hh:mm - hh:mm)</label>
+                                <label class="form-label">Work time (hh:mm)</label>
                                 <div class="input-group">
                                     <input type="time" class="form-control" wire:model="formData.work_time_start">
                                     <input type="time" class="form-control" wire:model="formData.work_time_end">
@@ -172,7 +172,7 @@
 
                             <!-- Time Zone & Status -->
                             <div class="col-md-4">
-                                <label class="form-label">Reference Timezone</label>
+                                <label class="form-label">Timezone</label>
                                 <select class="form-select" wire:model="formData.ref_time">
                                     <option value="">Select</option>
                                     <option value="UTC+1">UTC+1</option>
@@ -180,7 +180,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Campaign Status</label>
+                                <label class="form-label">Campaign status</label>
                                 <select class="form-select" wire:model="formData.status">
                                     <option>Planned</option>
                                     <option>Executed</option>
@@ -190,11 +190,11 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Status Date</label>
+                                <label class="form-label">Status date</label>
                                 <input type="datetime-local" class="form-control" wire:model="formData.">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Target Status</label>
+                                <label class="form-label">Target type</label>
                                 <select class="form-select" wire:model="formData.target_status">
                                     <option>TRG</option>
                                     <option>CDT</option>
