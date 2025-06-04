@@ -35,188 +35,103 @@
                 </div>
             </div>
             @endif
-            <div class="modal-content w-100 mb-1">
-
-                <div class="container py-4">
+            <div class="modal-content">
+                <!-- <div class="modal-header">
+                    <h2>MCPform</h2>
+                </div> -->
+                <div>
                     <form wire:submit.prevent="updateForm">
 
                         <div class="button-group">
                             <div class="button-group-left">
-                                <h5 class="text-white bg-danger px-3 py-2 rounded">MCP Form</h5>
-                                <div>
-                                    <a href="/mcpform" class="btn btn-outline-primary me-2">MCP <i class="fa-regular fa-square-plus ms-1"></i></a>
+                                <h5 style="background-color:#7D0A0A; border-radius:5px; color:white;padding:12px;margin-top:-2px">MCPform</h5>
+                                <a href="/mcpform">
+                                    <button type="button" class="btn btn-mcp">MCP <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                </a>
+                                <div class="one">
                                     <button id="linkNewCDT" type="button" class="btn btn-opp">OPP<i class="fas fa-link"></i></button>
+                                </div>
+                                <div class="one">
                                     <button id="linkNewCDT" type="button" class="btn btn-trg">TRG<i class="fas fa-link"></i></button>
-                                    <a href="/mcpevtlist" class="btn btn-outline-info me-2">EVT <i class="fa-regular fa-file-lines ms-1"></i></a>
+                                </div>
+                                <div class="one">
+                                    <a href="/mcpevtlist">
+                                        <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
+                                    </a>
                                     <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
-                                    <button type="button" class="btn btn-outline-danger me-2" wire:click="resetForm"><i class="fa-solid fa-eraser"></i></button>
-                                    <button type="button" style="background:red;" class="btn btn-danger"><i class="fa-regular fa-trash-can fa-lg"></i></button>
-                                    <button type="submit" class="btn btn-success me-2"><i class="fa-regular fa-floppy-disk"></i></button>
-                                    <button onclick="history.back()" type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
-                                    <a href="/mcpdashboard">
-                                        <button style="border-radius: 50%;" type="button" class="btn btn-close1"><i class="fa-solid fa-arrow-left"></i></button>
+                                </div>
+                                <div class="three">
+                                    <button type="button" class="btn btn-erase" wire:click="resetForm"><i class="fa-solid fa-eraser fa-lg"></i></button>
+                                    <button type="button" style="background:red;" class="btn btn-danger">
+                                        <i class="fa-regular fa-trash-can fa-lg"></i>
+                                    </button>
+                                    <button type="submit" class="btn btn-valid"><i class="fa-regular fa-floppy-disk fa-lg"></i></button>
+                                    <a href="/landing">
+                                        <button type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
                                     </a>
                                 </div>
                             </div>
                         </div>
 
 
-                        <div class="row g-3">
-                            <!-- Basic Info -->
-                            <div class="col-md-3">
-                                <label class="form-label">Date</label>
-                                <input type="date" class="form-control" wire:model="formData.date_mcp">
+                        <div class="form-row">
+                            <div class="form-group date-field">
+                                <label>Date</label>
+                                <input type="date" class="form-control1" wire:model="formData.date_mcp">
+                                @error('date_mcp') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">MCP Code</label>
-                                <input type="text" class="form-control" wire:model="formData.mcp_code" readonly>
+                            <div class="form-group objet-field">
+                                <label>MCPcode</label>
+                                <input type="text" class="form-control1" wire:model="formData.mcp_code" readonly>
+                                @error('mcp_code') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Designation</label>
-                                <input type="text" class="form-control" wire:model="formData.designation">
+                            <div class="form-group objet-field">
+                                <label>Designation</label>
+                                <input type="text" class="form-control1" wire:model="formData.designation">
+                                @error('designation') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Object</label>
-                                <input type="text" class="form-control" wire:model="formData.object">
+                            <div class="form-group objet-field">
+                                <label>Object</label>
+                                <input type="text" class="form-control1" wire:model="formData.object">
                             </div>
-
-                            <!-- Additional Details -->
-                            <div class="col-md-4">
-                                <label class="form-label">OPPcode</label>
-                                <input type="text" class="form-control" wire:model="formData.tag_source">
+                            <div class="form-group objet-field">
+                                <label>Tag Source</label>
+                                <input type="text" class="form-control1" wire:model="formData.tag_source">
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Message</label>
-                                <input type="text" class="form-control" wire:model="formData.message">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group objet-field">
+                                <label>Message</label>
+                                <input type="text" class="form-control1" wire:model="formData.message">
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Tool</label>
-                                <select class="form-select" wire:model="formData.tool">
+                            <div class="form-group objet-field">
+                                <label>Tool</label>
+                                <select class="form-control1" wire:model="formData.tool">
                                     <option value="">Select Tool</option>
                                     <option value="MCM">MCM</option>
                                     <option value="Outlook Direct">Outlook Direct</option>
                                 </select>
                             </div>
-
-                            <!-- File Uploads -->
-                            <div class="col-md-4">
-                                <label class="form-label">Recipient List (Excel/CSV)</label>
-                                <input type="file" class="form-control" wire:model="formData.recip_list_path">
+                            <div class="form-group objet-field">
+                                <label>Remarks</label>
+                                <input type="text" class="form-control1" wire:model="formData.remarks">
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Message Document (docx/pdf)</label>
-                                <input type="file" class="form-control" wire:model="formData.message_doc">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Attachments</label>
-                                <input type="file" class="form-control" wire:model="formData.attachments" multiple>
-                            </div>
-
-                            <!-- Email Info -->
-                            <!-- <div class="col-md-6">
-                                <label class="form-label">From (Sender Email)</label>
-                                <input type="email" class="form-control" wire:model="formData.from">
-                            </div> -->
-                            <div class="col-md-6">
-                                <label class="form-label">From (Sender Email)</label>
-                                <select class="form-select" wire:model="formData.from">
-                                    <!-- <option value="">Select Email</option> -->
-                                    <option value="bgilles@harmen-botts.com">bgilles@harmen-botts.com</option>
-                                    <option value="nikhilljp@gmail.com">nikhilljp@gmail.com</option>
-                                </select>
-                            </div>
-
-                            <!-- Email Pass Code Info -->
-                            <div class="col-md-6" hidden>
-                                <label class="form-label">Passcode</label>
-                                <input type="text" class="form-control" wire:model="formData.passcode" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Subject</label>
-                                <input type="text" class="form-control" wire:model="formData.subject">
-                            </div>
-
-                            <!-- Schedule Settings -->
-                            <div class="col-md-3">
-                                <label class="form-label">Launch Date</label>
-                                <input type="datetime-local" class="form-control" wire:model="formData.launch_date">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Mail Pause Time (in sec)</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" wire:model="formData.pause_min" placeholder="Min">
-                                    <input type="number" class="form-control" wire:model="formData.pause_max" placeholder="Max">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Batch Size (Min - Max)</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" wire:model="formData.batch_min" placeholder="Min">
-                                    <input type="number" class="form-control" wire:model="formData.batch_max" placeholder="Max">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Batch Pause Time(in min)</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" wire:model="formData." placeholder="Min">
-                                    <input type="number" class="form-control" wire:model="formData." placeholder="Max">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Work Time (hh:mm - hh:mm)</label>
-                                <div class="input-group">
-                                    <input type="time" class="form-control" wire:model="formData.work_time_start">
-                                    <input type="time" class="form-control" wire:model="formData.work_time_end">
-                                </div>
-                            </div>
-
-                            <!-- Time Zone & Status -->
-                            <div class="col-md-4">
-                                <label class="form-label">Reference Timezone</label>
-                                <select class="form-select" wire:model="formData.ref_time">
-                                    <option value="">Select</option>
-                                    <option value="UTC+1">UTC+1</option>
-                                    <option value="UTC+2">UTC+2</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Campaign Status</label>
-                                <select class="form-select" wire:model="formData.status">
-                                    <option>Planned</option>
-                                    <option>Executed</option>
-                                    <option>Running</option>
-                                    <option>Paused</option>
-                                    <option>Cancelled</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Status Date</label>
-                                <input type="datetime-local" class="form-control" wire:model="formData.">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Target Status</label>
-                                <select class="form-select" wire:model="formData.target_status">
-                                    <option>TRG</option>
-                                    <option>CDT</option>
-                                    <option>CTC</option>
-                                </select>
-                            </div>
-
-                            <!-- Comments -->
-                            <div class="col-md-12">
-                                <label class="form-label">Remarks</label>
-                                <input type="text" class="form-control" wire:model="formData.remarks">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Notes</label>
-                                <textarea class="form-control" rows="3" wire:model="formData.notes"></textarea>
-                            </div>
-                            <div class="mt-3">
-                                <button type="button" class="btn btn-info" wire:click="generatePreview">Preview First Email</button>
+                            <div class="form-group comment-field">
+                                <label>Note(s)</label>
+                                <textarea class="form-control2" wire:model="formData.notes"></textarea>
                             </div>
                         </div>
 
 
+                        <!-- <div class="button-group">
+                            <div class="button-group-left">
+                                <div class="three">
+                                    <button type="button" class="btn btn-erase" wire:click="cancelEdit">Cancel</button>
+                                    <button type="submit" class="btn btn-inputmain">Update</button>
+                                </div>
+
+                            </div>
+                        </div> -->
                     </form>
                 </div>
             </div>
@@ -446,15 +361,15 @@
         .button-group {
             display: flex;
             justify-content: space-between;
-            /* margin-top: 1%; */
-            margin-bottom: 2%;
+            margin-top: 1%;
+            margin-bottom: 1%;
             margin-left: -2%;
             padding: 0 20px;
         }
 
         .button-group-left {
             display: flex;
-            gap: 300px;
+            gap: 60px;
         }
 
         .button-group-right {
