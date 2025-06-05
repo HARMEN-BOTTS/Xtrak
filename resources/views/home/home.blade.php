@@ -169,7 +169,9 @@
             <button class="circle" style="font-size:1rem; background-color: #00FFFF;" id="">ANN</button>
             <button class="circle" style="font-size:1rem; background-color: #00FF00;" id="">CTC</button>
             
-            <div id="land" class="center-circle"></div>
+            <a href="/landing">
+                <div id="land" class="center-circle"></div>
+            </a>
 
         </div>
         @endif

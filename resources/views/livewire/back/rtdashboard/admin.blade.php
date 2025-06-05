@@ -1,7 +1,7 @@
 <div>
     @include('components.breadcrumb', [
     'title' => auth()->user()->hasRole('Manager') ? '' : '',
-    'breadcrumbItems' => [['text' => 'ADM', 'url' => ''] ,['text' => 'Landing', 'url' => '/landing'] ,['text' => 'Views', 'url' => ''] ,['text' => 'RTvue', 'url' => '/rtdashboard']],
+    'breadcrumbItems' => [['text' => 'ADM', 'url' => ''] ,['text' => 'Landing', 'url' => '/landing'] ,['text' => 'Views', 'url' => ''] ,['text' => 'XTKvue', 'url' => '/rtdashboard']],
     ])
 
     <div class="row">
@@ -25,10 +25,10 @@
 
                     <div class="button-group-main">
                         <div class="button-group-left-main">
-                            <h5 style="margin-left:-22px; background-color:red; border-radius:5px; color:white;padding:12px;margin-top:-2px">RTvue</h5>
+                            <h5 style="margin-left:-22px; background-color:red; border-radius:5px; color:white;padding:12px;margin-top:-2px">XTKvue</h5>
 
                             <a href="/rtform">
-                                <button type="button" class="btn btn-danger">RT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                <button type="button" class="btn btn-danger">XTK <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
                             </a>
 
                             <div class="one">
@@ -181,9 +181,9 @@
                                     <th class="date_col" scope="col" wire:click="sortBy('updated_at')" style="background-color: red;">
                                         Date
                                     </th>
-                                    <th class="libe_col" scope="col" style="background-color: red;">Auth</th>
+                                    <th class="libe_col" scope="col" style="background-color: red;">From</th>
                                     <th class="libe_col" scope="col" style="background-color: red;">Task Code</th>
-                                    <th class="cpdpt_col" scope="col" style="background-color: red;">Destination</th>
+                                    <th class="cpdpt_col" scope="col" style="background-color: red;">To</th>
                                     <th class="soci_col" scope="col" wire:click="sortBy('first_name')" style="background-color: red;">
                                         Type Input
                                     </th>

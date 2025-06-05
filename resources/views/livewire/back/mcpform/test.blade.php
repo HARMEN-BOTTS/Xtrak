@@ -1,11 +1,15 @@
 <div>
+
     @include('components.breadcrumb', [
     'title' => 'Nouvelle saisie',
     'breadcrumbItems' => [
-    ['text' => 'ADM', 'url' => ''] ,['text' => 'Landing', 'url' => '/landing'] ,['text' => 'Forms', 'url' => ''] ,['text' => 'XTKform', 'url' => '/rtform']
+    ['text' => 'ADM', 'url' => ''] ,['text' => 'Landing', 'url' => '/landing'] ,['text' => 'Forms', 'url' => ''] ,['text' => 'MCPform', 'url' => '/mcpform']
     ],
     ])
+
+
     <div class="row">
+
         <div style="margin-top: -1%;margin-left:-10px;" class="p-2 mb-3 d-flex justify-content-between">
             <div>
             </div>
@@ -19,10 +23,12 @@
                 <a href="{{ route('cstdashboard') }}" class="ms-2 text-black {{ request()->routeIs('cstdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CST</a>
             </div>
         </div>
+
+
         <div>
             @if (session()->has('message'))
             <div style="margin-top:-2%;" class="d-flex justify-content-left">
-                <div style="font-weight:bold;" class="alert alert-success alert-dismissible fade show " role="alert" id="successAlert">
+                <div class="alert alert-success alert-dismissible fade show " role="alert" id="successAlert">
                     {{ session()->get('message') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                         aria-label="Close"></button>
@@ -30,16 +36,26 @@
             </div>
             @endif
             <div class="modal-content">
+                <!-- <div class="modal-header">
+                    <h2>MCPform</h2>
+                </div> -->
                 <div>
-                    <form wire:submit.prevent="save">
+                    <form wire:submit.prevent="updateForm">
+
                         <div class="button-group">
                             <div class="button-group-left">
-                                <h5 style="margin-left:-22px; background-color:red; border-radius:5px; color:white;padding:12px;margin-top:-2px">XTKform</h5>
-                                <a href="/rtform">
-                                    <button type="button" class="btn btn-danger">XTK <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                <h5 style="background-color:#7D0A0A; border-radius:5px; color:white;padding:12px;margin-top:-2px">MCPform</h5>
+                                <a href="/mcpform">
+                                    <button type="button" class="btn btn-mcp">MCP <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
                                 </a>
                                 <div class="one">
-                                    <a href="">
+                                    <button id="linkNewCDT" type="button" class="btn btn-opp">OPP<i class="fas fa-link"></i></button>
+                                </div>
+                                <div class="one">
+                                    <button id="linkNewCDT" type="button" class="btn btn-trg">TRG<i class="fas fa-link"></i></button>
+                                </div>
+                                <div class="one">
+                                    <a href="/mcpevtlist">
                                         <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
                                     </a>
                                     <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
@@ -49,161 +65,90 @@
                                     <button type="button" style="background:red;" class="btn btn-danger">
                                         <i class="fa-regular fa-trash-can fa-lg"></i>
                                     </button>
-                                    <button onclick="history.back()" type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
-                                    <a href="/rtdashboard">
-                                        <button style="border-radius: 50%;" type="button" class="btn btn-close1"><i class="fa-solid fa-arrow-left"></i></button>
+                                    <button type="submit" class="btn btn-valid"><i class="fa-regular fa-floppy-disk fa-lg"></i></button>
+                                    <a href="/landing">
+                                        <button type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
                                     </a>
                                 </div>
                             </div>
                         </div>
 
+
                         <div class="form-row">
                             <div class="form-group date-field">
                                 <label>Date</label>
-                                <input type="date" class="form-control1" wire:model="date_rt">
-                                @error('date_rt') <span class="text-danger">{{ $message }}</span> @enderror
+                                <input type="date" class="form-control1" wire:model="formData.date_mcp">
+                                @error('date_mcp') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="form-group objet-field">
-                                <label>From</label>
-                                <select class="form-control1" wire:model="auth">
-                                    <option value="">Select</option>
-                                    <option value="ADM">BGS</option>
-                                    <option value="MGR">NKH</option>
-                                    <option value="CST">PJW</option>
-                                </select>
+                                <label>MCPcode</label>
+                                <input type="text" class="form-control1" wire:model="formData.mcp_code" readonly>
+                                @error('mcp_code') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="form-group objet-field">
-                                <label>Task code</label>
-                                <input type="text" class="form-control1" wire:model="task_code">
-                                @error('task_code') <span class="text-danger">{{ $message }}</span> @enderror
+                                <label>Designation</label>
+                                <input type="text" class="form-control1" wire:model="formData.designation">
+                                @error('designation') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="form-group objet-field">
-                                <label>To</label>
-                                <select class="form-control1" wire:model="destination">
-                                    <option value="">Select</option>
-                                    <option value="ADM">BGS</option>
-                                    <option value="MGR">NKH</option>
-                                    <option value="CST">PJW</option>
-                                </select>
+                                <label>Object</label>
+                                <input type="text" class="form-control1" wire:model="formData.object">
                             </div>
                             <div class="form-group objet-field">
-                                <!-- <label>Type Input</label>
-                                <input type="text" class="form-control1" wire:model="type_input"> -->
-                                <label>Type Input</label>
-                                <select class="form-control1" wire:model="type_input">
-                                    <option value="">Select</option>
-                                    <option value="Improve">Improve</option>
-                                    <option value="Bug">Bug</option>
-                                    <option value="Correc">Correc</option>
-                                    <option value="Error">Error</option>
-                                    <option value="Evolution">Evolution</option>
-                                    <option value="Upgrade">Upgrade</option>
-                                    <option value="Fix">Fix</option>
-                                </select>
-                            </div>
-                            <div class="form-group objet-field">
-                                <label>Subject</label>
-                                <input type="text" class="form-control1" wire:model="subject">
-                            </div>
-                            <div class="form-group objet-field">
-                                <label>Position</label>
-                                <input type="text" class="form-control1" wire:model="position">
-                            </div>
-                            <div class="form-group objet-field">
-                                <label>Status</label>
-                                <input type="text" class="form-control1" wire:model="status">
+                                <label>Tag Source</label>
+                                <input type="text" class="form-control1" wire:model="formData.tag_source">
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group date-field">
-                                <label>Re.</label>
-                                <input type="text" class="form-control1" wire:model="re">
-                                @error('re') <span class="text-danger">{{ $message }}</span> @enderror
+                            <div class="form-group objet-field">
+                                <label>Message</label>
+                                <input type="text" class="form-control1" wire:model="formData.message">
                             </div>
                             <div class="form-group objet-field">
-                                <label>Rk</label>
-                                <input type="text" class="form-control1" wire:model="rk">
-                            </div>
-                            <div class="form-group objet-field">
-                                <label>Problems</label>
-                                <input type="text" class="form-control1" wire:model="problems">
-                                @error('problems') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="form-group objet-field">
-                                <label>Delay</label>
-                                <input type="text" class="form-control1" wire:model="delay">
+                                <label>Tool</label>
+                                <select class="form-control1" wire:model="formData.tool">
+                                    <option value="">Select Tool</option>
+                                    <option value="MCM">MCM</option>
+                                    <option value="Outlook Direct">Outlook Direct</option>
+                                </select>
                             </div>
                             <div class="form-group objet-field">
                                 <label>Remarks</label>
-                                <input type="text" class="form-control1" wire:model="remarks">
-                            </div>
-                            <div class="form-group objet-field">
-                                <label>Priority</label>
-                                <input type="text" class="form-control1" wire:model="priority">
-                            </div>
-                            <div class="form-group objet-field">
-                                <label>Vol.</label>
-                                <input type="text" class="form-control1" wire:model="vol">
-                            </div>
-                        </div>
-                        <div class="form-row">
-
-                            <div class="form-group objet-field">
-                                <label>Corrective Actions</label>
-                                <input type="text" class="form-control1" wire:model="corrective_actions">
-                                @error('corrective_actions') <span class="text-danger">{{ $message }}</span> @enderror
+                                <input type="text" class="form-control1" wire:model="formData.remarks">
                             </div>
                             <div class="form-group comment-field">
-                                <label>Note1</label>
-                                <textarea class="form-control2" wire:model="note_one"></textarea>
-                            </div>
-                            <div class="form-group comment-field">
-                                <label>Note2</label>
-                                <textarea class="form-control2" wire:model="note_two"></textarea>
+                                <label>Note(s)</label>
+                                <textarea class="form-control2" wire:model="formData.notes"></textarea>
                             </div>
                         </div>
 
 
-
-                        <div class="modal fade" id="cdtModal" tabindex="-1">
-                            <div class="modal-dialog modal-dialog-centered cdt-modal-dialog">
-                                <div class="modal-content cdt-modal-content">
-                                    <div class="cdt-modal-header">
-                                        <span>Enter CTC code:</span>
-                                        <button type="button" class="cdt-close-btn" data-bs-dismiss="modal">×</button>
-                                    </div>
-                                    <div class="cdt-modal-body">
-                                        <div class="cdt-input-group">
-                                            <input type="text" class="cdt-input" id="cdtCode" value="">
-                                            <button type="button" class="cdt-ok-btn" id="okButton">OK</button>
-                                        </div>
-                                        <div class="cdt-message"></div>
-                                    </div>
+                        <!-- <div class="button-group">
+                            <div class="button-group-left">
+                                <div class="three">
+                                    <button type="button" class="btn btn-erase" wire:click="cancelEdit">Cancel</button>
+                                    <button type="submit" class="btn btn-inputmain">Update</button>
                                 </div>
+
                             </div>
-                        </div>
-
-
+                        </div> -->
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-
-    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .btn-danger {
-            background-color: red;
+        .btn-opp {
+            background-color: #6F61C0;
             color: white;
         }
 
-        .btn-danger:hover {
-            background-color: red;
+        .btn-opp:hover {
+            background-color: #6F61C0;
             color: white;
         }
+
 
         .btn-mcp {
             background-color: #7D0A0A;
@@ -225,6 +170,7 @@
             color: black;
         }
 
+
         .modal-content {
             background: none;
             border-radius: 8px;
@@ -241,7 +187,7 @@
         .modal-content {
             background-color: #fff;
             padding: 20px 25px;
-            width: 80%;
+            width: 95%;
             max-width: 1200px;
             border-radius: 2px;
 
@@ -416,7 +362,8 @@
             display: flex;
             justify-content: space-between;
             margin-top: 1%;
-            margin-bottom: 2%;
+            margin-bottom: 1%;
+            margin-left: -2%;
             padding: 0 20px;
         }
 
@@ -598,12 +545,12 @@
         }
     </style>
     <script>
-        setTimeout(function() {
-            var successAlert = document.getElementById('successAlert');
-            if (successAlert) {
-                successAlert.style.display = 'none';
-            }
-        }, 5000);
+        // setTimeout(function() {
+        //     var successAlert = document.getElementById('successAlert');
+        //     if (successAlert) {
+        //         successAlert.style.display = 'none';
+        //     }
+        // }, 3000);
 
         function confirm() {
             alert("Form Submitted Successfully ✅");

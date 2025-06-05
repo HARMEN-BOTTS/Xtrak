@@ -50,9 +50,10 @@
                                 <button type="button" class="btn btn-outline-danger me-2" wire:click="resetForm"><i class="fa-solid fa-eraser"></i></button>
                                 <button type="button" style="background:red;" class="btn btn-danger"><i class="fa-regular fa-trash-can fa-lg"></i></button>
                                 <button type="submit" class="btn btn-success me-2"><i class="fa-regular fa-floppy-disk"></i></button>
-                                <a href="/landing" class="btn btn-secondary"><i class="fas fa-times"></i></a>
-
-                       
+                                <button onclick="history.back()" type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+                                <a href="/mcpdashboard">
+                                    <button style="border-radius: 50%;" type="button" class="btn btn-close1"><i class="fa-solid fa-arrow-left"></i></button>
+                                </a>
                             </div>
                         </div>
 
@@ -63,7 +64,7 @@
                                 <input type="date" class="form-control" wire:model="date_mcp">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">MCP Code</label>
+                                <label class="form-label">MCP code</label>
                                 <input type="text" class="form-control" wire:model="mcp_code" readonly>
                             </div>
                             <div class="col-md-3">
@@ -77,7 +78,7 @@
 
                             <!-- Additional Details -->
                             <div class="col-md-4">
-                                <label class="form-label">Tag Source</label>
+                                <label class="form-label">OPPcode</label>
                                 <input type="text" class="form-control" wire:model="tag_source">
                             </div>
                             <div class="col-md-4">
@@ -95,11 +96,11 @@
 
                             <!-- File Uploads -->
                             <div class="col-md-4">
-                                <label class="form-label">Recipient List (Excel/CSV)</label>
+                                <label class="form-label">Recipient list (Excel/CSV)</label>
                                 <input type="file" class="form-control" wire:model="recip_list_path">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Message Document (docx/pdf)</label>
+                                <label class="form-label">Message (docx/pdf)</label>
                                 <input type="file" class="form-control" wire:model="message_doc">
                             </div>
                             <div class="col-md-4">
@@ -113,11 +114,11 @@
                                 <input type="email" class="form-control" wire:model="from">
                             </div> -->
                             <div class="col-md-6">
-                                <label class="form-label">From (Sender Email)</label>
+                                <label class="form-label">From (sender Email)</label>
                                 <select class="form-select" wire:model="from" wire:change="fetchPasscode">
                                     <option value="">Select Email</option>
                                     @foreach($mailOptions as $mail)
-                                        <option value="{{ $mail->email }}">{{ $mail->email }}</option>
+                                    <option value="{{ $mail->email }}">{{ $mail->email }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -134,25 +135,32 @@
 
                             <!-- Schedule Settings -->
                             <div class="col-md-3">
-                                <label class="form-label">Launch Date</label>
+                                <label class="form-label">Launch date</label>
                                 <input type="datetime-local" class="form-control" wire:model="launch_date">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Pause Time (Min - Max in sec)</label>
+                                <label class="form-label">Mail pause time (sec)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" wire:model="pause_min" placeholder="Min">
                                     <input type="number" class="form-control" wire:model="pause_max" placeholder="Max">
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Batch Size (Min - Max)</label>
+                                <label class="form-label">Batch Size (min - max)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" wire:model="batch_min" placeholder="Min">
                                     <input type="number" class="form-control" wire:model="batch_max" placeholder="Max">
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Work Time (HH:MM - HH:MM)</label>
+                                <label class="form-label">Batch Pause (min)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" wire:model="" placeholder="Min">
+                                    <input type="number" class="form-control" wire:model="" placeholder="Max">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Work time (hh:mm)</label>
                                 <div class="input-group">
                                     <input type="time" class="form-control" wire:model="work_time_start">
                                     <input type="time" class="form-control" wire:model="work_time_end">
@@ -161,7 +169,7 @@
 
                             <!-- Time Zone & Status -->
                             <div class="col-md-4">
-                                <label class="form-label">Reference Timezone</label>
+                                <label class="form-label">Timezone</label>
                                 <select class="form-select" wire:model="ref_time">
                                     <option value="">Select</option>
                                     <option value="UTC+1">UTC+1</option>
@@ -169,7 +177,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Campaign Status</label>
+                                <label class="form-label">Campaign status</label>
                                 <select class="form-select" wire:model="status">
                                     <option>Planned</option>
                                     <option>Executed</option>
@@ -178,8 +186,12 @@
                                     <option>Cancelled</option>
                                 </select>
                             </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Status date</label>
+                                <input type="datetime-local" class="form-control" wire:model="">
+                            </div>
                             <div class="col-md-4">
-                                <label class="form-label">Target Status</label>
+                                <label class="form-label">Target type</label>
                                 <select class="form-select" wire:model="target_status">
                                     <option>TRG</option>
                                     <option>CDT</option>
@@ -199,10 +211,12 @@
                             <div class="mt-3">
                                 <button type="button" class="btn btn-info" wire:click="generatePreview">Preview First Email</button>
                                 @if($previewMessage)
-                                    <div class="mt-3 p-3 border bg-light">
-                                        <h5>Preview for: {{ $previewRecipientEmail }}</h5>
-                                        <pre style="white-space: pre-wrap;">{!! nl2br(e($previewMessage)) !!}</pre>
+                                <div class="mt-3 p-3 border bg-light">
+                                    <h5>Preview for: {{ $previewRecipientEmail }}</h5>
+                                    <div style="border: 1px solid #ddd; padding: 15px; background-color: white; font-family: Arial, sans-serif; line-height: 1.4;">
+                                        {!! $previewMessage !!}
                                     </div>
+                                </div>
                                 @endif
                             </div>
                         </div>
