@@ -13,13 +13,13 @@
                         <div>
                         </div>
                         <div>
-                            <a href="{{ route('trgopplist') }}" class="me-2 text-black {{ request()->routeIs('trgopplist.*') ? 'text-decoration-underline fw-bold' : '' }}">TRG</a> -
-                            <a href="{{ route('management') }}" class="mx-2 text-black {{ request()->routeIs('management.*') ? 'text-decoration-underline fw-bold' : '' }}">CDT</a> -
-                            <a href="{{ route('opplist') }}" class="mx-2 text-black {{ request()->routeIs('opplist.*') ? 'text-decoration-underline fw-bold' : '' }}">OPP</a> -
-                            <a href="{{ route('mcplist') }}" class="mx-2 text-black {{ request()->routeIs('mcplist.*') ? 'text-decoration-underline fw-bold' : '' }}">MCP</a> -
-                            <a href="{{ route('ctclist') }}" class="mx-2 text-black {{ request()->routeIs('ctclist.*') ? 'text-decoration-underline fw-bold' : '' }}">CTC</a> -
-                            <a href="{{ route('management') }}" class="mx-2 text-black  {{ request()->routeIs('management.*') ? 'text-decoration-underline fw-bold' : '' }}">ANN</a> -
-                            <a href="{{ route('cstlist') }}" class="ms-2 text-black {{ request()->routeIs('cstlist.*') ? 'text-decoration-underline fw-bold' : '' }}">CST</a>
+                            <a href="{{ route('trgdashboard') }}" class="me-2 text-black {{ request()->routeIs('trgdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">TRG</a> -
+                            <a href="{{ route('dashboard') }}" class="mx-2 text-black {{ request()->routeIs('dashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CDT</a> -
+                            <a href="{{ route('oppdashboard') }}" class="mx-2 text-black  {{ request()->routeIs('oppdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">OPP</a> -
+                            <a href="{{ route('mcpdashboard') }}" class="mx-2 text-black {{ request()->routeIs('mcpdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">MCP</a> -
+                            <a href="{{ route('ctcdashboard') }}" class="mx-2 text-black {{ request()->routeIs('ctcdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CTC</a> -
+                            <a href="{{ route('dashboard') }}" class="mx-2 text-black  {{ request()->routeIs('dashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">ANN</a> -
+                            <a href="{{ route('cstdashboard') }}" class="ms-2 text-black {{ request()->routeIs('cstdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CST</a>
                         </div>
                     </div>
 
@@ -29,21 +29,27 @@
                     <div class="button-group-main">
                         <div class="button-group-left-main">
                             <h5 style="margin-left:-22px; background-color:#6F61C0; border-radius:5px; color:white;padding:12px;margin-top:-2px">OPP_EVTlist</h5>
-                            <div class="mt-1">
-                                <!-- <label for="trgcode">OPPcode</label> -->
-                                <input style="width:70px; padding:5px;" type="text" placeholder="OPPcode"></input>
-                            </div>
-                            <div class="mt-1">
-                                <!-- <label for="ctc-prenom">Libellé poste</label> -->
-                                <input style="width:120px;padding:5px;" type="text" placeholder="Company name"></input>
 
+                            @if($data->count() == 1)
+                            @foreach($data as $item)
+                            <div class="mt-1">
+                                <input style="width:120px; padding:5px;" type="text" placeholder="{{ $item->oppDashboard->opp_code ?? '--' }}"></input>
                             </div>
-                           
+                            <div class="mt-1">
+                                <input style="width:120px;padding:5px;" type="text" placeholder="{{ $item->oppDashboard-> name ?? '--' }}"></input>
+                            </div>
+                            @endforeach
+                            @else
+                            <div class="mt-2">
+                                <h5>ALL OPEN STATUS OPPS EVENTS</h5>
+                            </div>
+                            @endif
+
                             <div class="one">
-                                <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
                             </div>
                             <div class="three">
-                            <button wire:click="" id="delete-button-container" style="background:#F93827;" class="btn btn-danger">
+                                <button wire:click="deleteSelected" id="delete-button-container" style="background:#F93827;" class="btn btn-danger">
                                     <i class="fa-regular fa-trash-can fa-lg"></i>
                                 </button>
                                 <button style="background:#4CC9FE;" type="button" class="btn btn-close1"><i class="fa-regular fa-floppy-disk fa-lg"></i></button>
@@ -180,49 +186,45 @@
                                     <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Status</th>
                                     <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Comment</th>
                                     <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Next</th>
-                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Ech</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Term</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Cre. Date</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if(!empty($data) && (is_array($data) || is_object($data)) && count($data) > 0)
                                 @foreach($data as $item)
-                                <tr>
-                                    <!-- <td>{{ $item->creation_date }}</td>
-                                    <td>{{ $item->company }}</td>
-                                    <td>{{ $item->standard_phone }}</td>
-                                    <td>{{ $item->postal_code_department }}</td>
-                                    <td>{{ $item->title }}</td>
-                                    <td>{{ $item->first_name }}</td>
-                                    <td>{{ $item->last_name }}</td>
-                                    <td>{{ $item->position }}</td>
-                                    <td>{{ $item->email }}</td>
-                                    <td>{{ $item->mobile }}</td>
+                                <tr wire:key="row-{{ $item->id }}"
+                                    wire:click="toggleSelect({{ $item->id }})"
+                                    wire:dblclick="editRow({{ $item->id }})"
+                                    class="{{ in_array($item->id, $selectedRows) ? 'select-row' : '' }}"
+                                    style="cursor: pointer;">
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" class="candidate-checkbox" style="display:none;pointer-events: none;">
+                                    </td>
                                     <td>{{ $item->event_date }}</td>
                                     <td>{{ $item->type }}</td>
-                                    <td>{{ $item->subject }}</td>
-                                    <td>{{ $item->event_status }}</td>
-                                    <td>{{ $item->comment_trg }}</td>
-                                    <td>{{ $item->next_step }}</td> -->
-                                    <td class="checkbox-cell">
-                                        <input type="checkbox" class="candidate-checkbox"
-                                            style="display:none;pointer-events: none;">
+                                    <td>{{ $item->io }}</td>
+                                    <td>{{ $item->oppDashboard->ctc1_first_name ?? '' }}</td>
+                                    <td>{{ $item->oppDashboard->ctc2_last_name ?? '' }}</td>
+                                    <td>{{ $item->object }}</td>
+                                    <td>{{ $item->status }}</td>
+                                    <td>{{ $item->comment }}</td>
+                                    <td>{{ $item->next1 }}</td>
+                                    <td>{{ $item->term }}</td>
+                                    <td>{{ $item->created_at->format('d/m/y') }}</td>
+                                    <td>
+                                        <button
+                                            class="btn btn-sm btn-danger"
+                                            onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this event ⚠')) { @this.deleteEvent({{ $item->id }}); }">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-
                                 </tr>
                                 @endforeach
                                 @else
                                 <tr>
-                                    <td colspan="16" class="text-center">No data available</td>
+                                    <td colspan="13" class="text-center">No events available</td>
                                 </tr>
                                 @endif
                             </tbody>
@@ -276,164 +278,113 @@
             </div>
         </div>
 
-
-        <div id="evtModal" class="modal">
+        @if($showEventModal)
+        <div id="evtModal" class="modal" style="display:block">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 style="background:#FFB4A2;width:18%;padding:7px;text-align:center">TRG_EVTform</h2>
+                    <h2 style="border-radius:5px;background:#6F61C0;width:18%;padding:7px;text-align:center;color:white">OPP_EVTform</h2>
+                    <div class="form-group objet-field">
+                        <input type="text" class="form-control1" wire:model="eventFormData.opp_code">
+                    </div>
+                    <div class="form-group objet-field">
+                        <input type="text" class="form-control1" wire:model="eventFormData.job_titles">
+                    </div>
+                    <div class="form-group objet-field">
+                        <input type="text" class="form-control1" wire:model="eventFormData.name">
+                    </div>
+                    <a href="/oppdashboard">
+                        <h2 style="border-radius:5px;background:#6F61C0;width:100%;padding:7px;text-align:center;color:white">OPP_Vue</h2>
+                    </a>
                 </div>
-                <div class="icons-row">
-                    <div class="icon-item">
-                        <i class="fas fa-phone"></i>
-                    </div>
-                    <div class="icon-item">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <div class="icon-item">
-                        <i class="fas fa-pen"></i>
-                    </div>
-                    <div class="icon-item">
-                        <i class="fas fa-desktop"></i>
-                    </div>
-                    <div class="icon-item">
-                        <i class="fas fa-users"></i>
-                    </div>
-                </div>
-                <div class="status-buttons">
-                    <button class="status-btn">OCC</button>
-                    <button class="status-btn">NRP</button>
-                    <button class="status-btn">NRJ</button>
-                    <button class="status-btn">WRN</button>
-                    <button class="status-btn">NHS</button>
-                </div>
+
 
                 <div id="evtForm">
                     <div class="form-row">
-                        <div class="form-group statut-field">
-                            <label>TRG_Code</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group objet-field">
-                            <label>Company</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group statut-field">
-                            <label>CTC_Code</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group retour-field">
-                            <label>First Name </label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group retour-field">
-                            <label>Last Name</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group statut-field">
-                            <label>Function</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group date-field">
                             <label>Date</label>
-                            <input type="date" class="form-control1" value="">
+                            <input type="date" class="form-control1" wire:model="eventFormData.event_date">
                         </div>
                         <div class="form-group type-field">
                             <label>Type</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.type">
                         </div>
                         <div class="form-group io-field">
                             <label>I/O</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.io">
                         </div>
                         <div class="form-group objet-field">
                             <label>Objet</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group statut-field">
-                            <label>Statut</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" class="form-control1" wire:model="eventFormData.object">
                         </div>
                         <div class="form-group retour-field">
-                            <label>Retour</label>
-                            <input type="text" class="form-control1">
+                            <label>Feedback</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.feedback">
                         </div>
-                        <div class="form-group statut-field">
-                            <label>Temper</label>
-                            <input type="text" class="form-control1">
+                        <div class="form-group retour-field">
+                            <label>Statut</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.status">
                         </div>
                     </div>
+
+
 
                     <div class="comment-section">
                         <div class="form-group comment-field">
                             <label>Comment</label>
-                            <!-- <textarea class="form-control2"></textarea> -->
-                            <input type="text" class="form-control1">
+                            <textarea style="height:175px;" type="text" class="form-control1" wire:model="eventFormData.comment"></textarea>
                         </div>
                         <div class="right-section">
                             <div class="next-ech-row">
                                 <div class="form-group next-field">
                                     <label>Next</label>
-                                    <input type="text" class="form-control1">
+                                    <input type="text" class="form-control1" wire:model="eventFormData.next1">
                                 </div>
                                 <div class="form-group ech-field">
-                                    <label>Ech</label>
-                                    <input type="text" class="form-control1">
+                                    <label>Term</label>
+                                 <input type="text" class="form-control1" wire:model="eventFormData.term">
                                 </div>
-                                <div class="form-group ech-field">
-                                    <label>Priority</label>
-                                    <input type="text" class="form-control1">
-                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label>Note1</label>
+                                <textarea class="form-control1" wire:model="eventFormData.note1"></textarea>
                             </div>
                         </div>
                     </div>
 
-
-
-                    <div class="comment-section">
-                        <div class="form-group retour-field">
-                            <label>Last Comment</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="right-section">
-                            <div class="next-ech-row">
-                                <div class="form-group last-field">
-                                    <label>Date Last Com.</label>
-                                    <input type="text" class="form-control1">
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="form-group">
-                            <label>Other Comment</label>
-                            <textarea class="form-control1"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Note1</label>
-                            <textarea class="form-control1"></textarea>
-                        </div>
-                    </div>
 
                     <div class="button-group">
                         <div class="button-group-left">
                             <div class="one">
-                                <button type="button" class="btn btn-evt">EVTlist</button>
-                                <button type="button" class="btn btn-evt"> > New</button>
+                                <button type="button" class="btn btn-evt" wire:click="closeEventModal">EVTlist</button>
+                                <a href="/oppdashboard">
+                                    <button type="button" class="btn btn-evt"> > New</button>
+                                </a>
                             </div>
                             <div class="two">
-                                <button type="button" class="btn btn-valid">Valid</button>
-                                <button type="button" class="btn btn-inputmain">Input</button>
+                                <button type="button" class="btn btn-valid"
+                                    wire:click="validateEventForm">
+                                    Valid
+                                </button>
+                                <button type="button" class="btn btn-inputmain" wire:click="saveEvent">Save</button>
                             </div>
                             <div class="three">
-                                <button type="button" class="btn btn-erase" onclick="eraseForms()">Erase</button>
-                                <button type="button" class="btn btn-close1" onclick="closeModal()">Close</button>
+                                <button type="button" class="btn btn-erase"
+                                    wire:click="resetEventForm">Erase</button>
+                                <button type="button" class="btn btn-close1"
+                                    wire:click="closeEventModal">Close</button>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        @endif
+
+
+
+
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
@@ -443,6 +394,11 @@
                 cursor: pointer;
                 margin-top: 3px;
                 margin-left: 10px;
+            }
+
+
+            .select-row {
+                background-color: #37AFE1 !important;
             }
 
             .btn-danger {
@@ -510,8 +466,9 @@
 
 
             .modal-header {
-                margin-bottom: 5px;
-                margin-left: -12px;
+                gap:10px;
+                margin-top:-10px;
+                margin-left: -18px;
             }
 
             .modal-header h2 {
@@ -674,7 +631,8 @@
             .button-group {
                 display: flex;
                 justify-content: space-between;
-                margin-top: -30px;
+                margin-top: 10px;
+                margin-left:-20px;
                 padding: 0 20px;
             }
 
@@ -842,53 +800,47 @@
     </div>
     @push('page-script')
     <script>
-        document.getElementById("linkNewCDT").addEventListener("click", function() {
-            document.getElementById("customModal").style.display = "flex";
+        document.addEventListener('DOMContentLoaded', function() {
+
+            Livewire.on('open-event-modal', () => {
+                document.body.style.overflow = 'hidden';
+            });
+
+            Livewire.on('close-event-modal', () => {
+                document.body.style.overflow = 'auto';
+            });
+
+            let clickTimer = null;
+
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('tr[wire\\:dblclick]')) {
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                        clickTimer = null;
+                        return;
+                    }
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('status-btn')) {
+
+                    document.querySelectorAll('.status-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+
+                    e.target.classList.add('active');
+                }
+            });
         });
 
-        document.getElementById("closeModal").addEventListener("click", function() {
-            document.getElementById("customModal").style.display = "none";
-        });
-
-        document.getElementById("okButton").addEventListener("click", function() {
-            document.getElementById("customModal").style.display = "none";
-        });
-
-        document.getElementById("linkNewOPP").addEventListener("click", function() {
-            document.getElementById("customModalOPP").style.display = "flex";
-        });
-
-        document.getElementById("closeModalOPP").addEventListener("click", function() {
-            document.getElementById("customModalOPP").style.display = "none";
-        });
-
-        document.getElementById("okButtonOPP").addEventListener("click", function() {
-            document.getElementById("customModalOPP").style.display = "none";
-        });
-
-        function coming() {
-            alert("Coming Soon 🛑");
+        function closeModal() {
+            Livewire.dispatch('closeEventModal');
         }
 
-        // document.addEventListener("DOMContentLoaded", function() {
-        //     const linkNewCDT = document.getElementById('linkNewCDT');
-        //     const cdtModal = new bootstrap.Modal(document.getElementById('cdtModal'));
-        //     const okButton = document.getElementById('okButton');
-        //     const cdtCodeInput = document.getElementById('cdtCode');
-
-        //     linkNewCDT.addEventListener('click', function() {
-        //         cdtModal.show();
-        //     });
-
-        //     okButton.addEventListener('click', function() {
-        //         const code = cdtCodeInput.value.trim();
-        //         if (code) {
-        //             console.log('CDT Code submitted:', code);
-        //             cdtModal.hide();
-        //             cdtCodeInput.value = '';
-        //         }
-        //     });
-        // });
+        function eraseForms() {
+            Livewire.dispatch('resetEventForm');
+        }
 
         let currentlyVisibleCertificateIndex = null;
 

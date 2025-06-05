@@ -27,10 +27,10 @@
                                 N cdt embauchés : <strong> {{ $hiredCount }} </strong>
                             </span>
                         </div>
-                        <div>
+                          <div>
                             <a href="{{ route('trgdashboard') }}" class="me-2 text-black {{ request()->routeIs('trgdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">TRG</a> -
                             <a href="{{ route('dashboard') }}" class="mx-2 text-black {{ request()->routeIs('dashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CDT</a> -
-                            <a href="{{ route('oppdashboard') }}" class="mx-2  {{ request()->routeIs('oppdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">OPP</a> -
+                            <a href="{{ route('oppdashboard') }}" class="mx-2 {{ request()->routeIs('oppdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">OPP</a> -
                             <a href="{{ route('mcpdashboard') }}" class="mx-2 text-black {{ request()->routeIs('mcpdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">MCP</a> -
                             <a href="{{ route('ctcdashboard') }}" class="mx-2 text-black {{ request()->routeIs('ctcdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CTC</a> -
                             <a href="{{ route('dashboard') }}" class="mx-2 text-black  {{ request()->routeIs('dashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">ANN</a> -
@@ -66,10 +66,8 @@
 
 
                             <div class="one">
-                                <a href="/oppevtlist">
-                                    <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
-                                </a>
-                                <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                <button type="button" class="btn btn-evt" wire:click="showEventList()">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
+                                <button type="button" class="btn btn-evt" wire:click="openEventModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
                             </div>
 
 
@@ -460,6 +458,103 @@
         </div>
 
 
+        <div id="evtModal" class="modal1" style="display: {{ $showEventModal ? 'block' : 'none' }};">
+            <div class="modal-content1">
+                <div class="modal-header1">
+                    <h2 style="border-radius:5px;background:#6F61C0;width:18%;padding:7px;text-align:center;color:white">OPP_EVTform</h2>
+                    <div class="form-group objet-field">
+                        <input type="text" class="form-control1" wire:model="eventFormData.opp_code">
+                    </div>
+                    <div class="form-group objet-field">
+                        <input type="text" class="form-control1" wire:model="eventFormData.job_titles">
+                    </div>
+                    <div class="form-group objet-field">
+                        <input type="text" class="form-control1" wire:model="eventFormData.name">
+                    </div>
+                    <a href="/oppdashboard">
+                        <h2 style="border-radius:5px;background:#6F61C0;width:100%;padding:7px;text-align:center;color:white">OPP_Vue</h2>
+                    </a>
+                </div>
+
+
+                <div id="evtForm">
+
+                    <div class="form-row">
+                        <div class="form-group date-field">
+                            <label>Date</label>
+                            <input type="date" class="form-control1" wire:model="eventFormData.event_date">
+                        </div>
+                        <div class="form-group type-field">
+                            <label>Type</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.type">
+                        </div>
+                        <div class="form-group io-field">
+                            <label>I/O</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.io">
+                        </div>
+                        <div class="form-group objet-field">
+                            <label>Objet</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.object">
+                        </div>
+                        <div class="form-group retour-field">
+                            <label>Feedback</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.feedback">
+                        </div>
+                        <div class="form-group retour-field">
+                            <label>Statut</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.status">
+                        </div>
+                    </div>
+
+
+
+                    <div class="comment-section">
+                        <div class="form-group comment-field">
+                            <label>Comment</label>
+                            <textarea style="height:175px;" type="text" class="form-control1" wire:model="eventFormData.comment"></textarea>
+                        </div>
+                        <div class="right-section">
+                            <div class="next-ech-row">
+                                <div class="form-group next-field">
+                                    <label>Next</label>
+                                    <input type="text" class="form-control1" wire:model="eventFormData.next1">
+                                </div>
+                                <div class="form-group ech-field">
+                                    <label>Term</label>
+                                    <input type="text" class="form-control1" wire:model="eventFormData.term">
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label>Note1</label>
+                                <textarea class="form-control1" wire:model="eventFormData.note1"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:15px;" class="button-group">
+                        <div class="button-group-left">
+                            <div class="one">
+                                <button type="button" class="btn btn-evt" wire:click="showEventList()">EVTlist</button>
+                                <a href="/oppdashboard">
+                                    <button type="button" class="btn btn-evt"> > New</button>
+                                </a>
+                            </div>
+                            <div class="two">
+                                <button type="button" class="btn btn-input" wire:click="saveEvent()">Save</button>
+                            </div>
+                            <div class="three">
+                                <button type="button" class="btn btn-erase" wire:click="resetEventForm">Erase</button>
+                                <button type="button" class="btn btn-close1" wire:click="closeEventModal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
 
 
 
@@ -678,6 +773,274 @@
                 border-radius: 8px;
                 width: 300px;
                 text-align: left;
+            }
+
+
+
+            .modal-content1 {
+                background: none;
+                border-radius: 8px;
+                width: 300px;
+                text-align: left;
+            }
+
+            .modal1 {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1050;
+            }
+
+            .modal-content1 {
+                position: relative;
+                background-color: #fff;
+                margin: 5% auto;
+                padding: 20px 25px;
+                width: 100%;
+                max-width: 900px;
+                border-radius: 2px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+
+            .modal-header1 {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 8px;
+                margin-left: -12px;
+            }
+
+            .modal-header1 h2 {
+                color: #333;
+                font-size: 1.4em;
+                font-weight: 500;
+                margin-right: 10px;
+            }
+
+            .icons-row {
+                display: flex;
+                gap: 25px;
+                margin-top: 10px;
+                margin-bottom: -20px;
+                padding-left: 5px;
+            }
+
+            .icon-item {
+                font-size: 18px;
+                color: #555;
+            }
+
+            .divider {
+                height: 1px;
+                background-color: #ddd;
+                margin: 12px 0;
+            }
+
+            .status-buttons {
+                display: flex;
+                gap: 20px;
+                margin-top: -5px;
+                margin-bottom: 20px;
+                font-size: 1rem;
+                justify-content: flex-end;
+            }
+
+            .status-btn {
+                padding: 2px 8px;
+                border: none;
+                text-decoration: underline;
+                background: none;
+                cursor: pointer;
+                font-weight: 500;
+                color: #333;
+                font-size: 0.9em;
+            }
+
+            .form-row {
+                display: flex;
+                gap: 15px;
+                margin-top: 5px;
+                margin-bottom: 15px;
+                align-items: flex-start;
+            }
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .date-field {
+                width: 90px;
+            }
+
+            .type-field {
+                width: 60px;
+            }
+
+            .io-field {
+                width: 60px;
+            }
+
+            .date-field {
+                width: 115px;
+            }
+
+            .objet-field {
+                width: 200px;
+            }
+
+            .retour-field {
+                width: 200px;
+            }
+
+            .last-field {
+                width: 300px;
+            }
+
+
+
+            .statut-field {
+                width: 80px;
+            }
+
+            .comment-section {
+                display: flex;
+                gap: 15px;
+            }
+
+            .comment-field {
+                flex: 1;
+                max-width: 60%;
+            }
+
+            .right-section {
+                flex: 1;
+                max-width: 40%;
+            }
+
+            .next-ech-row {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 10px;
+            }
+
+            .next-field,
+            .ech-field {
+                flex: 1;
+            }
+
+            label {
+                color: black;
+            }
+
+            .form-control1 {
+                width: 100%;
+                padding: 8px 10px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 13px;
+                background-color: #f8f8f8;
+            }
+
+            .form-control2 {
+                width: 100%;
+                padding: 6px 8px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 13px;
+                background-color: #f8f8f8;
+            }
+
+            textarea.form-control1 {
+                min-height: 100px;
+                resize: vertical;
+            }
+
+            textarea.form-control2 {
+                min-height: 177px;
+                resize: vertical;
+            }
+
+
+            .button-group-left {
+                display: flex;
+                gap: 25px;
+            }
+
+            .button-group-right {
+                display: flex;
+            }
+
+            .btn-input {
+                background-color: #06D001;
+                color: white;
+            }
+
+            .btn-input:hover {
+                background-color: #06D001;
+                color: white;
+            }
+
+            .btn-erase {
+                background-color: #ff5722;
+                color: white;
+            }
+
+            .btn-valid {
+                background-color: #69247C;
+                color: white;
+            }
+
+            .btn-valid:hover {
+                background-color: #6F61C0;
+                color: white;
+            }
+
+            .btn-erase:hover {
+                background-color: #ff5722;
+                color: white;
+            }
+
+            .btn-historique {
+                background-color: #2196f3;
+                color: white;
+            }
+
+            .btn-historique:hover {
+                background-color: #2196f3;
+                color: white;
+            }
+
+            .btn-close1 {
+                background-color: #000080;
+                color: white;
+            }
+
+            .btn-close1:hover {
+                background-color: #000080;
+                color: white;
+            }
+
+
+            .evt-button {
+                background: #FF77B7;
+                border: none;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+            }
+
+            .evt-button i {
+                font-size: 14px;
             }
         </style>
 

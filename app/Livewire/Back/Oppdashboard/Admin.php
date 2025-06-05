@@ -17,6 +17,9 @@ use App\Models\OppCstLink; // We'll create this model
 use App\Models\Mcpdashboard; // Add this
 use App\Models\OppMcpLink; // We'll create this model
 
+// Event : 
+use App\Models\OppEvent;
+
 class Admin extends Component
 {
     use WithPagination;
@@ -82,6 +85,12 @@ class Admin extends Component
     protected $rules_mcp = [
         'mcpCode' => 'required',
     ];
+
+
+    // Event : 
+
+    public $showEventModal = false;
+    public $eventFormData = [];
 
     public $showCheckboxes = false;
 
@@ -861,6 +870,152 @@ class Admin extends Component
         $this->closeMcpModal();
         $this->dispatch('closeModal', modalId: 'mcpLinkModal');
     }
+
+
+
+
+
+    // Event : 
+
+
+    // Add these methods
+    public function openEventModal()
+    {
+        if (empty($this->selectedRows)) {
+            $this->dispatch('alert', type: 'error', message: "Please select at least one row to create event");
+            return;
+        }
+
+        // Get the first selected row data to populate form
+        $selectedItem = Oppdashboard::find($this->selectedRows[0]);
+
+        if ($selectedItem) {
+            $this->eventFormData = [
+                'opp_id' => $selectedItem->id,
+                'opp_code' => $selectedItem->opp_code,
+                'job_titles' => $selectedItem->job_titles,
+                'name' => $selectedItem->getKeyName,
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'feedback' => '',
+                'status' => '',
+                'comment' => '',
+                'next1' => '',
+                'term' => '',
+                'note1' => ''
+            ];
+        }
+
+        $this->showEventModal = true;
+        $this->dispatch('open-event-modal');
+    }
+
+    public function closeEventModal()
+    {
+        $this->showEventModal = false;
+        $this->eventFormData = [];
+        $this->dispatch('close-event-modal');
+    }
+
+    public function saveEvent()
+    {
+        // $this->validate([
+        //     'eventFormData.event_date' => 'required|date',
+        //     'eventFormData.type' => 'required',
+        // ]);
+
+        OppEvent::create([
+            'opp_id' => $this->eventFormData['opp_id'],
+            'event_date' => $this->eventFormData['event_date'],
+            'type' => $this->eventFormData['type'],
+            'io' => $this->eventFormData['io'],
+            'object' => $this->eventFormData['object'],
+            'feedback' => $this->eventFormData['feedback'],
+            'status' => $this->eventFormData['status'],
+            'comment' => $this->eventFormData['comment'],
+            'next1' => $this->eventFormData['next1'],
+            'term' => $this->eventFormData['term'],
+            'note1' => $this->eventFormData['note1'],
+        ]);
+
+        $this->dispatch('alert', type: 'success', message: "Event created successfully");
+        $this->closeEventModal();
+    }
+
+    public function showEventList()
+    {
+        if (empty($this->selectedRows)) {
+            // Show all events
+            redirect()->route('oppevtlist');
+            return;
+        }
+
+        $eventDataCount = OppEvent::whereIn('opp_id', $this->selectedRows)->count();
+
+
+        if ($eventDataCount === 0) {
+            $this->dispatch('alert', type: 'error', message: "No event created for selected row");
+            return;
+        }
+
+        // Show events for selected rows
+        redirect()->route('oppevtlist', ['selectedRows' => $this->selectedRows]);
+    }
+
+    public function resetEventForm()
+    {
+        $selectedItem = null;
+        if (!empty($this->selectedRows)) {
+            $selectedItem = Oppdashboard::find($this->selectedRows[0]);
+        }
+
+        if ($selectedItem) {
+
+            $this->eventFormData = [
+                'opp_id' => $selectedItem->id,
+                'opp_code' => $selectedItem->trg_code,
+                'job_titles' => $selectedItem->job_titles,
+                'name' => $selectedItem->getKeyName,
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'feedback' => '',
+                'status' => '',
+                'comment' => '',
+                'next1' => '',
+                'term' => '',
+                'note1' => ''
+            ];
+        } else {
+            $this->eventFormData = [
+                'opp_id' => '',
+                'opp_code' => '',
+                'job_titles' => '',
+                'name' => '',
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'feedback' => '',
+                'status' => '',
+                'comment' => '',
+                'next1' => '',
+                'term' => '',
+                'note1' => ''
+            ];
+        }
+
+        $this->dispatch('alert', type: 'info', message: "Form has been reset");
+        $this->dispatch('form-reset');
+    }
+
+
+
+
+
 
 
     public function render()
