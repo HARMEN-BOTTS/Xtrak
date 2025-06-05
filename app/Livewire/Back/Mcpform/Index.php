@@ -181,7 +181,9 @@ class Index extends Component
             $attachments_paths = [];
             if (!empty($this->attachments)) {
                 foreach ($this->attachments as $file) {
-                    $attachments_paths[] = $file->store('mcp/attachments', 'public');
+                    $originalName = $file->getClientOriginalName();
+                    $path = $file->storeAs('mcp/attachments', $originalName, 'public');
+                    $attachments_paths[] = $path;
                 }
             }
 
