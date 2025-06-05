@@ -206,7 +206,7 @@
                                     <td>{{ $item->type }}</td>
                                     <td>{{ $item->io }}</td>
                                     <td>{{ $item->oppDashboard->ctc1_first_name ?? '' }}</td>
-                                    <td>{{ $item->oppDashboard->ctc2_last_name ?? '' }}</td>
+                                    <td>{{ $item->oppDashboard->ctc1_last_name ?? '' }}</td>
                                     <td>{{ $item->object }}</td>
                                     <td>{{ $item->status }}</td>
                                     <td>{{ $item->comment }}</td>
