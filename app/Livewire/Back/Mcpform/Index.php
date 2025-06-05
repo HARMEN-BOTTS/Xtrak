@@ -127,6 +127,7 @@ class Index extends Component
     public function save()
     {
         // $this->validate();
+        set_time_limit(300);
 
         $this->mcp_code = $this->generateMcpCode();
 
@@ -181,9 +182,12 @@ class Index extends Component
             $attachments_paths = [];
             if (!empty($this->attachments)) {
                 foreach ($this->attachments as $file) {
-                    $attachments_paths[] = $file->store('mcp/attachments', 'public');
+                    $originalName = $file->getClientOriginalName();
+                    $path = $file->storeAs('mcp/attachments', $originalName, 'public');
+                    $attachments_paths[] = $path;
                 }
             }
+
 
             Mcpdashboard::create([
                 'date_mcp' => $this->date_mcp,
