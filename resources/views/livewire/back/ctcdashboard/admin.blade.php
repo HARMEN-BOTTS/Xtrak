@@ -445,7 +445,7 @@
         </div>
 
 
-        <div style="margin-top:-40%;" class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true" wire:ignore.self>
+        <div style="margin-top:-60%;" class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-sm">
                 <div class="modal-content bg-white">
                     <div class="modal-header">
