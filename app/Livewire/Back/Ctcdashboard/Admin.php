@@ -85,12 +85,27 @@ class Admin extends Component
         }
     }
 
+    // public function exportData()
+    // {
+    //     try {
+    //         return Excel::download(new CtcdashboardExport, 'ctc_dashboard_' . date('Y-m-d_H-i-s') . '.xlsx');
+    //     } catch (\Exception $e) {
+    //         $this->dispatch('alert', type: 'error', message: "Export failed: " . $e->getMessage());
+    //     }
+    // }
+
+    public $isExporting = false;
+
     public function exportData()
     {
+        $this->isExporting = true;
+
         try {
             return Excel::download(new CtcdashboardExport, 'ctc_dashboard_' . date('Y-m-d_H-i-s') . '.xlsx');
         } catch (\Exception $e) {
             $this->dispatch('alert', type: 'error', message: "Export failed: " . $e->getMessage());
+        } finally {
+            $this->isExporting = false;
         }
     }
 

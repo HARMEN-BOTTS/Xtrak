@@ -63,14 +63,24 @@
                                     <button type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
                                 </a>
                             </div>
+                            @if (auth()->user()->hasRole('Administrateur'))
                             <div class="">
                                 <button style="background:#0065F8;color:white;" type="button" class="btn btn-close1" wire:click="openImportModal">
                                     Import<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i>
                                 </button>
-                                <button style="background:#FF7601;color:white;" type="button" class="btn btn-close1" wire:click="exportData">
+                                <!-- <button style="background:#FF7601;color:white;" type="button" class="btn btn-close1" wire:click="exportData">
                                     Export<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i>
+                                </button> -->
+                                <button style="background:#FF7601;color:white;" type="button" class="btn btn-close1" wire:click="exportData" wire:loading.attr="disabled" wire:target="exportData">
+                                    <span wire:loading.remove wire:target="exportData">Export<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></span>
+                                    <span wire:loading wire:target="exportData">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Exporting...</span>
+                                        </div>
+                                    </span>
                                 </button>
                             </div>
+                            @endif
                         </div>
                     </div>
 

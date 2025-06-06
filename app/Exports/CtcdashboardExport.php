@@ -3,26 +3,38 @@
 namespace App\Exports;
 
 use App\Models\Ctcdashboard;
-use Maatwebsite\Excel\Concerns\FromCollection;
+// Change FromCollection to FromQuery
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+// Add these new concerns
+use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+// use Maatwebsite\Excel\Concerns\FromCollection;
+// use Maatwebsite\Excel\Concerns\WithHeadings;
+// use Maatwebsite\Excel\Concerns\WithMapping;
+// use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+// use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+// use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class CtcdashboardExport implements FromCollection, WithHeadings, WithMapping, WithColumnFormatting, ShouldAutoSize
+class CtcdashboardExport implements FromQuery, WithHeadings, WithMapping, WithColumnFormatting, ShouldAutoSize, WithChunkReading
 {
     /**
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Database\Query\Builder
      */
-    public function collection()
+    public function query()
     {
-        return Ctcdashboard::all();
+        return Ctcdashboard::query(); // Use query() instead of all()
     }
 
-    /**
-     * Define headings for the export
-     */
+    public function chunkSize(): int
+    {
+        return 5000;
+    }
+  
     public function headings(): array
     {
         return [
