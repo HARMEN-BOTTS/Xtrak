@@ -13,13 +13,13 @@
                         <div>
                         </div>
                         <div>
-                            <a href="{{ route('trgopplist') }}" class="me-2 text-black {{ request()->routeIs('trgopplist.*') ? 'text-decoration-underline fw-bold' : '' }}">TRG</a> -
-                            <a href="{{ route('management') }}" class="mx-2 text-black {{ request()->routeIs('management.*') ? 'text-decoration-underline fw-bold' : '' }}">CDT</a> -
-                            <a href="{{ route('opplist') }}" class="mx-2 text-black {{ request()->routeIs('opplist.*') ? 'text-decoration-underline fw-bold' : '' }}">OPP</a> -
-                            <a href="{{ route('mcplist') }}" class="mx-2 text-black {{ request()->routeIs('mcplist.*') ? 'text-decoration-underline fw-bold' : '' }}">MCP</a> -
-                            <a href="{{ route('ctclist') }}" class="mx-2 text-black {{ request()->routeIs('ctclist.*') ? 'text-decoration-underline fw-bold' : '' }}">CTC</a> -
-                            <a href="{{ route('management') }}" class="mx-2 text-black  {{ request()->routeIs('management.*') ? 'text-decoration-underline fw-bold' : '' }}">ANN</a> -
-                            <a href="{{ route('cstlist') }}" class="ms-2 text-black {{ request()->routeIs('cstlist.*') ? 'text-decoration-underline fw-bold' : '' }}">CST</a>
+                            <a href="{{ route('trgdashboard') }}" class="me-2 text-black {{ request()->routeIs('trgdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">TRG</a> -
+                            <a href="{{ route('dashboard') }}" class="mx-2 text-black {{ request()->routeIs('dashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CDT</a> -
+                            <a href="{{ route('oppdashboard') }}" class="mx-2 text-black  {{ request()->routeIs('oppdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">OPP</a> -
+                            <a href="{{ route('mcpdashboard') }}" class="mx-2 text-black  {{ request()->routeIs('mcpdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">MCP</a> -
+                            <a href="{{ route('ctcdashboard') }}" class="mx-2 text-black {{ request()->routeIs('ctcdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CTC</a> -
+                            <a href="{{ route('dashboard') }}" class="mx-2 text-black  {{ request()->routeIs('dashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">ANN</a> -
+                            <a href="{{ route('cstdashboard') }}" class="ms-2 text-black {{ request()->routeIs('cstdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CST</a>
                         </div>
                     </div>
 
@@ -29,20 +29,27 @@
                     <div class="button-group-main">
                         <div class="button-group-left-main">
                             <h5 style="margin-left:-22px; background-color:#7D0A0A; border-radius:5px; color:white;padding:12px;margin-top:-2px">MCP_EVTlist</h5>
-                            <div class="mt-1">
-                                <!-- <label for="trgcode">OPPcode</label> -->
-                                <input style="width:90px; padding:5px;" type="text" placeholder="MCPcode"></input>
-                            </div>
-                            <div class="mt-1">
-                                <!-- <label for="ctc-prenom">Libellé poste</label> -->
-                                <input style="width:180px;padding:5px;" type="text" placeholder="Company designation"></input>
-
+                            <div class="mt-2">
+                                <h5>ALL MCP EVENTS</h5>
                             </div>
                             <div class="one">
-                                <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                <a href="/mcpform">
+                                    <button style="color:white; background-color:#7D0A0A" type="button" class="btn">MCP <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                </a>
+                            </div>
+                            <div class="one">
+                                @if($selectedRows)
+                                <a href="#" wire:click.prevent="viewMcmReport">
+                                    <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
+                                </a>
+                                @else
+                                <a href="/mcpevtlist">
+                                    <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
+                                </a>
+                                @endif
                             </div>
                             <div class="three">
-                            <button wire:click="" id="delete-button-container" style="background:#F93827;" class="btn btn-danger">
+                                <button wire:click="deleteSelected()" id="delete-button-container" style="background:#F93827;" class="btn btn-danger">
                                     <i class="fa-regular fa-trash-can fa-lg"></i>
                                 </button>
                                 <button style="background:#4CC9FE;" type="button" class="btn btn-close1"><i class="fa-regular fa-floppy-disk fa-lg"></i></button>
@@ -170,53 +177,42 @@
                                 <tr>
                                     <th style="width:2%;background-color:#F9C0AB;" scope="col"><input type="checkbox" id="select-all-checkbox" class="candidate-checkbox"
                                             style="display:none;" wire:model="selectAll"></th>
-                                    <th class="cdt_col" scope="col" style="background-color:#F9C0AB;">Date</th>
+                                    <th class="cdt_col" scope="col" style="background-color:#F9C0AB;">Start Date</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">End Date</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">CodeMCP</th>
                                     <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Type</th>
-                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">I/O</th>
-                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">From</th>
-                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">To</th>
-                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Object</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Designation</th>
                                     <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Status</th>
-                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Comment</th>
-                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Next</th>
-                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Ech</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Total Mails</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Success</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Fails</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if(!empty($data) && (is_array($data) || is_object($data)) && count($data) > 0)
                                 @foreach($data as $item)
-                                <tr>
-                                    <!-- <td>{{ $item->creation_date }}</td>
-                                    <td>{{ $item->company }}</td>
-                                    <td>{{ $item->standard_phone }}</td>
-                                    <td>{{ $item->postal_code_department }}</td>
-                                    <td>{{ $item->title }}</td>
-                                    <td>{{ $item->first_name }}</td>
-                                    <td>{{ $item->last_name }}</td>
-                                    <td>{{ $item->position }}</td>
-                                    <td>{{ $item->email }}</td>
-                                    <td>{{ $item->mobile }}</td>
-                                    <td>{{ $item->event_date }}</td>
-                                    <td>{{ $item->type }}</td>
-                                    <td>{{ $item->subject }}</td>
-                                    <td>{{ $item->event_status }}</td>
-                                    <td>{{ $item->comment_trg }}</td>
-                                    <td>{{ $item->next_step }}</td> -->
-                                    <td class="checkbox-cell">
-                                        <input type="checkbox" class="candidate-checkbox"
-                                            style="display:none;pointer-events: none;">
+                                <tr wire:key="row-{{ $item->id }}"
+                                    wire:click="toggleSelect({{ $item->id }})"
+                                    wire:dblclick="editRow({{ $item->id }})"
+                                    class="{{ in_array($item->id, $selectedRows) ? 'select-row' : '' }}"
+                                    style="cursor: pointer;">
+                                    <td class="checkbox-cell" onclick="event.stopPropagation()">
+                                        @if($showCheckboxes)
+                                        <input type="checkbox"
+                                            value="{{ $item->id }}"
+                                            wire:click="toggleSelect({{ $item->id }})"
+                                            {{ in_array((string)$item->id, $selectedRows) ? 'checked' : '' }}>
+                                        @endif
                                     </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-
+                                    <td>{{ $item->date_mcp }}</td>
+                                    <td>{{ $item->date_mcp }}</td>
+                                    <td>{{ $item->mcp_code }}</td>
+                                    <td>{{ $item->target_status }}</td>
+                                    <td>{{ $item->designation }}</td>
+                                    <td>{{ $item->status }}</td>
+                                    <td>{{ $item->total_mails ?? 0 }}</td>
+                                    <td>{{ $item->success_count ?? 0 }}</td>
+                                    <td>{{ $item->fails_count ?? 0 }}</td>
                                 </tr>
                                 @endforeach
                                 @else
@@ -446,6 +442,10 @@
 
             .btn-danger {
                 background-color: red;
+            }
+
+            .select-row {
+                background-color: #37AFE1 !important;
             }
 
             .btn-evt {

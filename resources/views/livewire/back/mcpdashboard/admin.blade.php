@@ -40,10 +40,16 @@
                                 <button type="button" class="btn btn-trg" wire:click="openTrgModal"><i class="fas fa-link"></i></button>
                             </div>
                             <div class="one">
+                                @if($selectedRows)
+                                <a href="#" wire:click.prevent="viewMcmReport">
+                                    <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
+                                </a>
+                                @else
                                 <a href="/mcpevtlist">
                                     <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
                                 </a>
-                                <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                @endif
+                                <!-- <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button> -->
                             </div>
 
                             <div class="two">

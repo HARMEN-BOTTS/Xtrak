@@ -11,10 +11,14 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Mail\Mailer as LaravelMailer;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use App\Mail\CustomMailable;
+use App\Models\Mcpdashboard;
+use App\Models\McpEmailLog;
+use Carbon\Carbon;
+
 
 class SendBatchEmails implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $recipients;
     public $subject;
@@ -26,8 +30,9 @@ class SendBatchEmails implements ShouldQueue
     public $batchMax;
     public $pauseMin;
     public $pauseMax;
+    public $mcpCode;
 
-    public function __construct($recipients, $subject, $body, $attachmentPaths, $sender, $appPassword, $batchMin, $batchMax, $pauseMin, $pauseMax)
+    public function __construct($recipients, $subject, $body, $attachmentPaths, $sender, $appPassword, $batchMin, $batchMax, $pauseMin, $pauseMax, $mcpCode = null)
     {
         $this->recipients = $recipients;
         $this->subject = $subject;
@@ -35,16 +40,12 @@ class SendBatchEmails implements ShouldQueue
         $this->attachmentPaths = $attachmentPaths;
         $this->sender = $sender;
         $this->appPassword = $appPassword;
-        // $this->batchMin = $batchMin;
-        // $this->batchMax = $batchMax;
-        // $this->pauseMin = $pauseMin;
-        // $this->pauseMax = $pauseMax;
-
+        $this->mcpCode = $mcpCode;
+        
         $this->batchMin = !empty($batchMin) && is_numeric($batchMin) ? (int)$batchMin : 1;
         $this->batchMax = !empty($batchMax) && is_numeric($batchMax) ? (int)$batchMax : 10;
         $this->pauseMin = !empty($pauseMin) && is_numeric($pauseMin) ? (int)$pauseMin : 1;
         $this->pauseMax = !empty($pauseMax) && is_numeric($pauseMax) ? (int)$pauseMax : 5;
-
 
         if ($this->batchMin > $this->batchMax) {
             $this->batchMin = $this->batchMax;
@@ -60,51 +61,138 @@ class SendBatchEmails implements ShouldQueue
      */
     public function handle()
     {
-        $transport = new EsmtpTransport('smtp.gmail.com', 587, false); // STARTTLS
+        // Count total mails properly - this should always be the count of all recipients
+        $totalMails = count($this->recipients);
+        $successCount = 0;
+        $failsCount = 0;
+        $attemptedCount = 0; // Track how many emails we actually attempted to send
+
+        // Find the MCP dashboard record to update statistics
+        $mcpRecord = null;
+        $designation = '';
+        $targetStatus = '';
+        
+        if ($this->mcpCode) {
+            $mcpRecord = Mcpdashboard::where('mcp_code', $this->mcpCode)->first();
+            if ($mcpRecord) {
+                // Set total_mails to the actual count of recipients
+                $mcpRecord->update([
+                    'total_mails' => $totalMails,
+                    'success_count' => 0,
+                    'fails_count' => 0,
+                ]);
+                
+                $designation = $mcpRecord->designation;
+                $targetStatus = $mcpRecord->target_status;
+            }
+        }
+
+        $transport = new EsmtpTransport('smtp.gmail.com', 587, false);
         $transport->setUsername($this->sender);
         $transport->setPassword($this->appPassword);
 
         $mailer = new LaravelMailer('smtp', View::getFacadeRoot(), $transport, app('events'));
 
         $batches = array_chunk($this->recipients, rand($this->batchMin, $this->batchMax));
+        $launchDate = now();
 
         foreach ($batches as $batch) {
             foreach ($batch as $recipient) {
-                // 1. Personalize body text
-                $personalized = str_replace(
-                    ['{civility}', '{firstName}', '{lastName}', '{domain}'],
-                    [$recipient['civility'], $recipient['first_name'], $recipient['last_name'], $recipient['domain']],
-                    $this->body
-                );
+                $attemptedCount++; // Increment for each email we attempt
+                
+                // Generate random pause time between min and max
+                $pauseTime = rand($this->pauseMin, $this->pauseMax);
+                
+                // Prepare recipient information
+                $recipientEmail = $recipient['email'] ?? '';
+                $recipientName = trim(($recipient['civility'] ?? '') . ' ' . ($recipient['first_name'] ?? '') . ' ' . ($recipient['last_name'] ?? ''));
+                $company = $recipient['domain'] ?? '';
+                $currentTime = now();
+                
+                try {
+                    // Validate email format first
+                    if (!filter_var($recipientEmail, FILTER_VALIDATE_EMAIL)) {
+                        throw new \Exception('Invalid email format: ' . $recipientEmail);
+                    }
 
-                // 2. Convert paragraphs to <p> tags
-                // $paragraphs = preg_split('/\R\R+/', trim($personalized));
-                // $formattedHtml = '';
-                // foreach ($paragraphs as $para) {
-                //     // $formattedHtml .= '<p>' . nl2br(e(trim($para))) . '</p>';
-                //     $formattedHtml .= '<p>' . nl2br(trim($para)) . '</p>';
-                // }
+                    // 1. Personalize body text
+                    $personalized = str_replace(
+                        ['{civility}', '{firstName}', '{lastName}', '{domain}'],
+                        [$recipient['civility'] ?? '', $recipient['first_name'] ?? '', $recipient['last_name'] ?? '', $recipient['domain'] ?? ''],
+                        $this->body
+                    );
 
-                // 2. Process HTML content properly
-                $formattedHtml = $this->processWordDocContent($personalized);
+                    // 2. Process HTML content properly
+                    $formattedHtml = $this->processWordDocContent($personalized);
 
-                // 3. Add embedded logo and footer signature (via cid)
-                // $formattedHtml .= '<br><img src="cid:footerlogo" alt="Logo" style="height:40px; margin-top:10px;">';
+                    // 3. Send mail with HTML body
+                    $mailer->to($recipientEmail, $recipientName)
+                        ->send(new CustomMailable(
+                            $this->subject,
+                            $formattedHtml,
+                            $this->attachmentPaths,
+                            $this->sender
+                        ));
 
-                // 4. Send mail with HTML body
-                $mailer->to($recipient['email'], $recipient['first_name'] . ' ' . $recipient['last_name'])
-                    ->send(new CustomMailable(
-                        $this->subject,
-                        $formattedHtml,
-                        $this->attachmentPaths,
-                        $this->sender
-                    ));
+                    $successCount++;
+                    
+                    // Log successful email send
+                    McpEmailLog::create([
+                        'mcp_code' => $this->mcpCode,
+                        'launch_date' => $launchDate->toDateString(),
+                        'hour' => $currentTime->format('H:i:s'),
+                        'pause' => $pauseTime,
+                        'status' => 'Success',
+                        'designation' => $designation,
+                        'target_status' => $targetStatus,
+                        'recipient_email' => $recipientEmail,
+                        'recipient_name' => $recipientName,
+                        'company' => $company
+                    ]);
+                    
+                } catch (\Exception $e) {
+                    $failsCount++;
+                    
+                    // Log failed email send
+                    McpEmailLog::create([
+                        'mcp_code' => $this->mcpCode,
+                        'launch_date' => $launchDate->toDateString(),
+                        'hour' => $currentTime->format('H:i:s'),
+                        'pause' => $pauseTime,
+                        'status' => 'Failed',
+                        'designation' => $designation,
+                        'target_status' => $targetStatus,
+                        'recipient_email' => $recipientEmail,
+                        'recipient_name' => $recipientName,
+                        'company' => $company,
+                        'error_message' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            // Update statistics after each batch with correct totals
+            if ($mcpRecord) {
+                $mcpRecord->update([
+                    'success_count' => $successCount,
+                    'fails_count' => $failsCount,
+                ]);
             }
 
             sleep(rand($this->pauseMin, $this->pauseMax));
         }
-    }
 
+        // Final update - ensure the math is correct
+        if ($mcpRecord) {
+            // Double-check that success + fails = total attempted
+            $finalTotalAttempted = $successCount + $failsCount;
+
+            $mcpRecord->update([
+                'total_mails' => $totalMails, 
+                'success_count' => $successCount,
+                'fails_count' => $failsCount,
+            ]);
+        }
+    }
 
     private function processWordDocContent($content)
     {
@@ -294,6 +382,3 @@ class SendBatchEmails implements ShouldQueue
         return $text;
     }
 }
-
-
-

@@ -292,6 +292,18 @@ class Admin extends Component
                 'tool' => $this->formData['tool'] ?? null,
                 'remarks' => $this->formData['remarks'] ?? null,
                 'notes' => $this->formData['notes'] ?? null,
+                'from_email' => $this->formData['from_email'] ?? null,
+                'subject' => $this->formData['subject'] ?? null,
+                'launch_date' => $this->formData['launch_date'] ?? null,
+                'pause_min' => $this->formData['pause_min'] ?? null,
+                'pause_max' => $this->formData['pause_max'] ?? null,
+                'work_time_start' => $this->formData['work_time_start'] ?? null,
+                'work_time_end' => $this->formData['work_time_end'] ?? null,
+                'ref_time' => $this->formData['ref_time'] ?? null,
+                'target_status' => $this->formData['target_status'] ?? null,
+                'status' => $this->formData['status'] ?? null,
+                'status_date' => $this->formData['status_date'] ?? null,
+
             ]);
 
             $this->isEditing = false;
@@ -317,6 +329,29 @@ class Admin extends Component
         }
 
         $this->resetPage();
+    }
+
+
+    // Update the viewMcmReport method
+    public function viewMcmReport()
+    {
+        if (count($this->selectedRows) === 1) {
+            $selectedMcp = Mcpdashboard::find($this->selectedRows[0]);
+            if ($selectedMcp) {
+                // Add debugging
+                info("Redirecting to MCM report with mcp_code: " . $selectedMcp->mcp_code);
+
+                // Redirect to MCM report with the selected MCP code
+                return redirect()->route('mcpreport', ['mcpCode' => $selectedMcp->mcp_code]);
+            }
+        }
+
+        // Show error message if multiple rows are selected
+        if (count($this->selectedRows) > 1) {
+            session()->flash('error', 'Please select only one campaign to view the report.');
+        } else if (count($this->selectedRows) === 0) {
+            session()->flash('error', 'Please select a campaign to view the report.');
+        }
     }
 
     public function render()

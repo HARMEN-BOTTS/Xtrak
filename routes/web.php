@@ -21,6 +21,8 @@ use App\Http\Controllers\CstController;
 use App\Http\Controllers\CtclistController;
 use App\Http\Controllers\CstlistController;
 use App\Http\Controllers\McplistController;
+use App\Http\Controllers\McpReportController;
+
 
 use App\Http\Controllers\CdtMcpController;
 use App\Http\Controllers\TrgCtcController;
@@ -113,9 +115,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/cstopplist', [CstOppController::class, 'index'])->name('cstopplist');
     Route::get('/mcpevtlist', [McpEvtController::class, 'index'])->name('mcpevtlist');
     Route::get('/mcpdstlist', [McpDstController::class, 'index'])->name('mcpdstlist');
+    Route::get('/mcpreport/{mcpCode}', [McpReportController::class, 'index'])->name('mcpreport');
 
 
-   
+
     // Route::get('trgform', [LandingController::class, 'trgform'])->name('trgform');
     // Route::get('ctcform', [LandingController::class, 'ctcform'])->name('ctcform');
 
@@ -131,7 +134,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/rtform', [App\Http\Controllers\RtController::class, 'index'])->name('rtform.index');
     Route::get('/rtform/{id}', [App\Http\Controllers\RtController::class, 'show'])->name('rtform.show');
 
-    
+
     Route::get('/trgform', [App\Http\Controllers\TrgController::class, 'index'])->name('trgform.index');
     Route::get('/trgform/{id}', [App\Http\Controllers\TrgController::class, 'show'])->name('trgform.show');
 
@@ -148,7 +151,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 
 
-    
+
     Route::resource('users', UserController::class);
     Route::get('roles-permissions', [RolePermissionController::class, 'index'])->name('roles.permissions');
     Route::resource('roles', RoleController::class);
@@ -175,9 +178,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/mail-auth', [MailAuthController::class, 'index'])->name('mailauth');
     Route::post('/mail-auth', [MailAuthController::class, 'store'])->name('mailauth.store');
 
-    
 
-    
+
+
     Route::get('tables', [DasboardController::class, 'tables'])->name('tables');
     Route::get('filtrages', [DasboardController::class, 'filtrages'])->name('filtrages');
     Route::get('vue', [DasboardController::class, 'vue'])->name('vue');
@@ -211,7 +214,3 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/autocomplete/positions', [PositionController::class, 'autocomplete'])->name('autocomplete.positions');
 });
 Route::get('commandes/{param}', [DasboardController::class, 'commande']);
-
-
-
-

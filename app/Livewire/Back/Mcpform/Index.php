@@ -30,7 +30,7 @@ class Index extends Component
     public $date_mcp, $mcp_code, $designation, $object, $tag_source, $message, $tool;
     public $recip_list_path, $message_doc, $attachments = [];
     public $from, $subject, $launch_date, $pause_min, $pause_max, $batch_min, $batch_max;
-    public $work_time_start, $work_time_end, $ref_time, $status, $target_status, $remarks, $notes;
+    public $work_time_start, $work_time_end, $ref_time, $status, $status_date, $target_status, $remarks, $notes;
 
 
     public $editId;
@@ -156,15 +156,16 @@ class Index extends Component
                     'work_time_end' => $this->work_time_end,
                     'ref_time' => $this->ref_time,
                     'status' => $this->status,
+                    'status_date' => $this->status_date,
                     'target_status' => $this->target_status,
                     'remarks' => $this->remarks,
                     'notes' => $this->notes,
-
                 ]);
 
                 $this->dispatch('alert', type: 'success', message: "Record updated successfully!");
             }
         } else {
+            // Create directories
             if (!Storage::disk('public')->exists('mcp/recipients')) {
                 Storage::disk('public')->makeDirectory('mcp/recipients');
             }
@@ -175,6 +176,7 @@ class Index extends Component
                 Storage::disk('public')->makeDirectory('mcp/attachments');
             }
 
+            // Store files
             $recip_list_path = $this->recip_list_path ? $this->recip_list_path->store('mcp/recipients', 'public') : null;
             $message_doc_path = $this->message_doc ? $this->message_doc->store('mcp/messages', 'public') : null;
 
@@ -187,6 +189,92 @@ class Index extends Component
                 }
             }
 
+            // Read recipients from Excel ONCE and count TOTAL vs VALID
+            $allRecipients = [];
+            $validRecipients = [];
+            $totalEmailsInFile = 0;
+
+            if ($recip_list_path) {
+                $spreadsheet = IOFactory::load(storage_path('app/public/' . $recip_list_path));
+                $sheet = $spreadsheet->getActiveSheet();
+                $startRow = 2;
+
+                foreach ($sheet->getRowIterator($startRow) as $row) {
+                    $cellIterator = $row->getCellIterator();
+                    $cellIterator->setIterateOnlyExistingCells(false);
+
+                    $email = $firstName = $lastName = $civility = $domain = '';
+
+                    foreach ($cellIterator as $cell) {
+                        $col = $cell->getColumn();
+                        $val = trim($cell->getFormattedValue());
+
+                        if ($col === 'E') $email = $val;
+                        elseif ($col === 'C') $firstName = $val;
+                        elseif ($col === 'D') $lastName = $val;
+                        elseif ($col === 'B') $civility = $val;
+                        elseif ($col === 'G') $domain = $val;
+                    }
+
+                    // Count every row with an email (even if invalid)
+                    if (!empty($email)) {
+                        $totalEmailsInFile++;
+
+                        $recipientData = [
+                            'email' => $email,
+                            'first_name' => $firstName,
+                            'last_name' => $lastName,
+                            'civility' => $civility,
+                            'domain' => $domain,
+                        ];
+
+                        // Add to allRecipients (includes invalid emails)
+                        $allRecipients[] = $recipientData;
+
+                        // Only add valid emails to validRecipients for actual processing
+                        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                            $validRecipients[] = $recipientData;
+                        }
+                    }
+                }
+            }
+
+            // Read DOCX message content
+            $text = '';
+            if ($message_doc_path) {
+                $docPath = storage_path('app/public/' . $message_doc_path);
+                $reader = WordIOFactory::createReader('Word2007');
+                $doc = $reader->load($docPath);
+
+                foreach ($doc->getSections() as $section) {
+                    foreach ($section->getElements() as $element) {
+                        if (method_exists($element, 'getText')) {
+                            $text .= $element->getText() . "\n\n";
+                        }
+                    }
+                }
+            }
+
+            // Extract first embedded image (e.g. logo) from Word
+            if ($message_doc_path) {
+                $docPath = storage_path('app/public/' . $message_doc_path);
+                $zip = new ZipArchive();
+                $zip->open($docPath);
+                $imageName = null;
+
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    $filename = $zip->getNameIndex($i);
+                    if (str_starts_with($filename, 'word/media/') && preg_match('/\.(jpg|jpeg|png)$/i', $filename)) {
+                        $imageData = $zip->getFromIndex($i);
+                        $imageName = 'public/mailer/extracted_logo.png';
+                        Storage::put($imageName, $imageData);
+                        break;
+                    }
+                }
+                $zip->close();
+            }
+
+            // Create database record with TOTAL emails from file (not just valid ones)
             Mcpdashboard::create([
                 'date_mcp' => $this->date_mcp,
                 'mcp_code' => $this->mcp_code,
@@ -209,126 +297,39 @@ class Index extends Component
                 'work_time_end' => $this->work_time_end,
                 'ref_time' => $this->ref_time,
                 'status' => $this->status,
+                'status_date' => $this->status_date,
                 'target_status' => $this->target_status,
                 'remarks' => $this->remarks,
                 'notes' => $this->notes,
+                'total_mails' => $totalEmailsInFile, // This should be 10 (total emails in file)
+                'success_count' => 0,
+                'fails_count' => 0,
             ]);
 
-            // 1. Read recipients from Excel
-            $spreadsheet = IOFactory::load(storage_path('app/public/' . $recip_list_path));
-            $sheet = $spreadsheet->getActiveSheet();
-
-            $recipients = [];
-            $startRow = 2;
-
-            foreach ($sheet->getRowIterator($startRow) as $row) {
-                $cellIterator = $row->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(false);
-
-                $email = $firstName = $lastName = $civility = $domain = '';
-
-                foreach ($cellIterator as $cell) {
-                    $col = $cell->getColumn();
-                    $val = trim($cell->getFormattedValue());
-
-                    if ($col === 'E') $email = $val;
-                    elseif ($col === 'C') $firstName = $val;
-                    elseif ($col === 'D') $lastName = $val;
-                    elseif ($col === 'B') $civility = $val;
-                    elseif ($col === 'G') $domain = $val;
-                }
-
-                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $recipients[] = [
-                        'email' => $email,
-                        'first_name' => $firstName,
-                        'last_name' => $lastName,
-                        'civility' => $civility,
-                        'domain' => $domain,
-                    ];
-                }
-            }
-
-
-            // 2. Read DOCX message content
-            $docPath = storage_path('app/public/' . $message_doc_path);
-            $reader = WordIOFactory::createReader('Word2007');
-            $doc = $reader->load($docPath);
-            $text = '';
-
-            foreach ($doc->getSections() as $section) {
-                foreach ($section->getElements() as $element) {
-                    if (method_exists($element, 'getText')) {
-                        $text .= $element->getText() . "\n\n";
-                    }
-                }
-            }
-
-
-            // extract first embedded image (e.g. logo) from Word
-            $zip = new ZipArchive();
-            $zip->open($docPath);
-            $imageName = null;
-
-            for ($i = 0; $i < $zip->numFiles; $i++) {
-                $filename = $zip->getNameIndex($i);
-                if (str_starts_with($filename, 'word/media/') && preg_match('/\.(jpg|jpeg|png)$/i', $filename)) {
-                    $imageData = $zip->getFromIndex($i);
-                    $imageName = 'public/mailer/extracted_logo.png';
-                    Storage::put($imageName, $imageData);
-                    break;
-                }
-            }
-            $zip->close();
-
-
-
-            // var_dump($recipients); 
-            // dd($recipients); 
-            // var_dump($text);
-
-
-            // 3. Setup mailer dynamically with Gmail SMTP (Symfony Mailer)
-            $transport = new EsmtpTransport('smtp.gmail.com', 587, true);
-            $transport->setUsername($this->from);
-            $transport->setPassword($this->passcode);
-
-            // 2. Create Laravel-compatible Mailer using the transport directly
-            $mailer = new LaravelMailer('smtp', app('view'), $transport, app('events'));
-
-            // 4. Schedule sending
+            // Dispatch job with ALL recipients (including invalid ones)
+            // The job will handle validation and count failures properly
             $launchTime = $this->launch_date ? Carbon::parse($this->launch_date) : now();
-            $batchMin = $this->batch_min ?? 5;
-            $batchMax = $this->batch_max ?? 10;
-            $pauseMin = $this->pause_min ?? 5;
-            $pauseMax = $this->pause_max ?? 10;
-
-            $subject = $this->subject;
-            $sender = $this->from;
-            $appPassword = $this->passcode;
-            $launchTime = $this->launch_date ? \Carbon\Carbon::parse($this->launch_date) : now();
 
             dispatch(new SendBatchEmails(
-                $recipients,
-                $subject,
+                $allRecipients, // Send ALL recipients, not just valid ones
+                $this->subject,
                 $text,
                 $attachments_paths,
-                $sender,
-                $appPassword,
+                $this->from,
+                $this->passcode,
                 $this->batch_min,
                 $this->batch_max,
                 $this->pause_min,
-                $this->pause_max
+                $this->pause_max,
+                $this->mcp_code
             ))->delay($launchTime);
 
-            // session()->flash('message', 'Form submitted and email campaign scheduled ✅');
             $this->dispatch('alert', type: 'success', message: "Form submitted and email campaign scheduled");
         }
 
         $this->resetForm();
         $this->loadEntries();
     }
-
 
 
 
@@ -640,6 +641,7 @@ class Index extends Component
             'work_time_end',
             'ref_time',
             'status',
+            'status_date',
             'target_status',
             'remarks',
             'notes'
