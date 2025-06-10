@@ -30,10 +30,13 @@ class mcpdashboard extends Migration
             $table->time('work_time_end')->nullable();
             $table->string('ref_time')->nullable();
             $table->string('status')->nullable();
+            $table->date('status_date')->nullable();
             $table->string('target_status')->nullable();
             $table->string('remarks')->nullable();
             $table->text('notes')->nullable();
-
+            $table->integer('total_mails')->nullable();
+            $table->integer('success_count')->nullable();
+            $table->integer('fails_count')->nullable();
         });
     }
 

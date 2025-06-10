@@ -45,10 +45,10 @@
                                 <h5 class="text-white bg-danger px-3 py-2 rounded">MCP Form</h5>
                                 <div>
                                     <a href="/mcpform" class="btn btn-outline-primary me-2">MCP <i class="fa-regular fa-square-plus ms-1"></i></a>
-                                    <button id="linkNewCDT" type="button" class="btn btn-opp">OPP<i class="fas fa-link"></i></button>
-                                    <button id="linkNewCDT" type="button" class="btn btn-trg">TRG<i class="fas fa-link"></i></button>
+                                    <button  type="button" class="btn btn-opp">OPP<i class="fas fa-link"></i></button>
+                                    <button  type="button" class="btn btn-trg">TRG<i class="fas fa-link"></i></button>
                                     <a href="/mcpevtlist" class="btn btn-outline-info me-2">EVT <i class="fa-regular fa-file-lines ms-1"></i></a>
-                                    <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                    <!-- <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button> -->
                                     <button type="button" class="btn btn-outline-danger me-2" wire:click="resetForm"><i class="fa-solid fa-eraser"></i></button>
                                     <button type="button" style="background:red;" class="btn btn-danger"><i class="fa-regular fa-trash-can fa-lg"></i></button>
                                     <button type="submit" class="btn btn-success me-2"><i class="fa-regular fa-floppy-disk"></i></button>
@@ -119,8 +119,7 @@
                             </div> -->
                             <div class="col-md-6">
                                 <label class="form-label">From (sender Email)</label>
-                                <select class="form-select" wire:model="formData.from">
-                                    <!-- <option value="">Select Email</option> -->
+                                <select class="form-select" wire:model="formData.from_email">
                                     <option value="bgilles@harmen-botts.com">bgilles@harmen-botts.com</option>
                                     <option value="nikhilljp@gmail.com">nikhilljp@gmail.com</option>
                                 </select>
@@ -182,23 +181,25 @@
                             <div class="col-md-4">
                                 <label class="form-label">Campaign status</label>
                                 <select class="form-select" wire:model="formData.status">
-                                    <option>Planned</option>
-                                    <option>Executed</option>
-                                    <option>Running</option>
-                                    <option>Paused</option>
-                                    <option>Cancelled</option>
+                                    <option value="">Select</option>
+                                    <option value="Planned">Planned</option>
+                                    <option value="Executed">Executed</option>
+                                    <option value="Running">Running</option>
+                                    <option value="Paused">Paused</option>
+                                    <option value="Cancelled">Cancelled</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Status date</label>
-                                <input type="datetime-local" class="form-control" wire:model="formData.">
+                                <input type="datetime-local" class="form-control" wire:model="formData.status_date">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Target type</label>
                                 <select class="form-select" wire:model="formData.target_status">
-                                    <option>TRG</option>
-                                    <option>CDT</option>
-                                    <option>CTC</option>
+                                    <option value="">Select</option>
+                                    <option value="TRG">TRG</option>
+                                    <option value="CDT">CDT</option>
+                                    <option value="CTC">CTC</option>
                                 </select>
                             </div>
 

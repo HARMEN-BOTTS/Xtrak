@@ -32,7 +32,11 @@ class Mcpdashboard extends Model
         'work_time_end',
         'ref_time',
         'status',
+        'status_date',
         'target_status',
+        'total_mails',
+        'success_count',
+        'fails_count',
     ];
 
     public function oppLinks()
