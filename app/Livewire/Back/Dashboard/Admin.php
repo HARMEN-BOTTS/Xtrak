@@ -24,11 +24,21 @@ use App\Models\Mcpdashboard; // Add this
 use App\Models\CdtMcpLink; // We'll create this model
 
 
+// Import/Export related
+use Livewire\WithFileUploads;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CdtdashboardImport;
+use App\Exports\CdtdashboardExport;
+
+// Import necessary classes at the top
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 
 class Admin extends Component
 {
     use WithPagination;
+    use WithFileUploads;
 
     protected $paginationTheme = 'bootstrap';
     public $search = '';
@@ -78,6 +88,64 @@ class Admin extends Component
         'mcpCode' => 'required',
     ];
 
+    // Import/Export properties
+    public $showImportModal = false;
+    public $importFile;
+
+    // Import validation rules
+    protected $rules_import = [
+        'importFile' => 'required|mimes:xlsx,xls,csv|max:10240', // 10MB max
+    ];
+
+
+    // Import/Export Methods
+    public function openImportModal()
+    {
+        $this->showImportModal = true;
+        $this->importFile = null;
+        $this->dispatch('open-import-modal');
+    }
+
+    public function closeImportModal()
+    {
+        $this->showImportModal = false;
+        $this->importFile = null;
+        $this->dispatch('closeModal', modalId: 'importModal');
+    }
+
+    public function importData()
+    {
+        $this->validate($this->rules_import);
+
+        try {
+            Excel::import(new CdtdashboardImport, $this->importFile->getRealPath());
+
+            $this->closeImportModal();
+            $this->refreshData();
+            $this->dispatch('alert', type: 'success', message: "Data imported successfully!");
+        } catch (\Exception $e) {
+            $this->dispatch('alert', type: 'error', message: "Import failed: " . $e->getMessage());
+        }
+    }
+
+  
+
+    public $isExporting = false;
+
+    public function exportData()
+    {
+        $this->isExporting = true;
+
+        try {
+            return Excel::download(new CdtdashboardExport, 'cdt_dashboard_' . date('Y-m-d_H-i-s') . '.xlsx');
+        } catch (\Exception $e) {
+            $this->dispatch('alert', type: 'error', message: "Export failed: " . $e->getMessage());
+        } finally {
+            $this->isExporting = false;
+        }
+    }
+
+
     public $totalPages = 0;
     public $currentPageMessage = '';
 
@@ -91,11 +159,9 @@ class Admin extends Component
             // $this->currentPageMessage = "Showing page $pageNumber of $maxPage";
             // session()->flash('success', "Successfully navigated to page $pageNumber");
             $this->dispatch('alert', type: 'success', message: "Successfully navigated to page $pageNumber");
-          
         } else {
             // session()->flash('error', "Invalid page number. Please enter a number between 1 and $maxPage.");
             $this->dispatch('alert', type: 'error', message: "Invalid page number. Please enter a number between 1 and $maxPage.");
-          
         }
     }
 
@@ -165,7 +231,7 @@ class Admin extends Component
             $this->checkboxes = [];
         }
 
-         // Check for linked data
+        // Check for linked data
         $selectedIds = array_keys(array_filter($this->checkboxes));
 
         if (!empty($selectedIds)) {
@@ -191,7 +257,6 @@ class Admin extends Component
         } else {
             $this->dispatch('disable-opplist-button');
         }
-
     }
 
     public function sortBy($column)
@@ -723,7 +788,7 @@ class Admin extends Component
         if (empty($selectedIds) && empty($this->selectedCandidateId)) {
             // session()->flash('error', 'Please select at least one candidate to link');
             $this->dispatch('alert', type: 'error', message: "Please select at least one opportunity to link");
-    
+
             return;
         }
 
@@ -777,7 +842,7 @@ class Admin extends Component
             $this->oppCode = '';
             $this->closeOppModal();
             $this->dispatch('closeModal', modalId: 'oppLinkModal');
-        
+
             return;
         }
 
@@ -786,7 +851,7 @@ class Admin extends Component
 
         // Link each selected opportunity to the CDT
         $candidateIds = explode(',', $this->selectedCandidateId);
-        foreach ( $candidateIds as $cdtId) {
+        foreach ($candidateIds as $cdtId) {
             // Check if already linked
             $existingLink = CdtOppLink::where('cdt_id', $cdtId)
                 ->where('opp_id', $candidate->id)
@@ -813,21 +878,19 @@ class Admin extends Component
             $this->oppCode = '';
             $this->closeOppModal();
             $this->dispatch('closeModal', modalId: 'oppLinkModal');
-        
         } elseif ($linkedCount > 0) {
             // session()->flash('linkmessage', "$linkedCount candidates linked successfully");
             $this->dispatch('alert', type: 'success', message: "$linkedCount candidates linked successfully");
             $this->oppCode = '';
             $this->closeOppModal();
             $this->dispatch('closeModal', modalId: 'oppLinkModal');
-        
         } elseif ($alreadyLinkedCount > 0) {
             // $this->oppLinkError = "Selected candidates are already linked to this CDT";
             $this->dispatch('alert', type: 'error', message: "Selected candidates are already linked to this CDT");
             $this->oppCode = '';
             $this->closeOppModal();
             $this->dispatch('closeModal', modalId: 'oppLinkModal');
-        
+
             return;
         }
 
@@ -846,7 +909,7 @@ class Admin extends Component
         if (empty($selectedIds) && empty($this->selectedCandidateId)) {
             // session()->flash('error', 'Please select at least one candidate to link');
             $this->dispatch('alert', type: 'error', message: "Please select at least one opportunity to link");
-    
+
             return;
         }
 
@@ -860,7 +923,7 @@ class Admin extends Component
         $this->dispatch('open-mcp-modal');
     }
 
-    
+
     public function closeMcpModal()
     {
         $this->showMcpModal = false;
@@ -879,7 +942,7 @@ class Admin extends Component
         if (empty($this->selectedCandidateId)) {
             // $this->mcpLinkError = 'Please select at least one candidate to link';
             $this->dispatch('alert', type: 'error', message: "Please select at least one candidate to link");
-        
+
             return;
         }
 
@@ -892,7 +955,7 @@ class Admin extends Component
             $this->mcpCode = '';
             $this->closeMcpModal();
             $this->dispatch('closeModal', modalId: 'mcpLinkModal');
-        
+
             return;
         }
 
@@ -928,21 +991,19 @@ class Admin extends Component
             $this->mcpCode = '';
             $this->closeMcpModal();
             $this->dispatch('closeModal', modalId: 'mcpLinkModal');
-        
         } elseif ($linkedCount > 0) {
             // session()->flash('linkmessage', "$linkedCount candidates linked successfully");
             $this->dispatch('alert', type: 'success', message: "$linkedCount candidates linked successfully");
             $this->mcpCode = '';
             $this->closeMcpModal();
             $this->dispatch('closeModal', modalId: 'mcpLinkModal');
-        
         } elseif ($alreadyLinkedCount > 0) {
             // $this->mcpLinkError = "Selected candidates are already linked to this CDT";
             $this->dispatch('alert', type: 'error', message: "Selected candidates are already linked to this CDT");
             $this->mcpCode = '';
             $this->closeMcpModal();
             $this->dispatch('closeModal', modalId: 'mcpLinkModal');
-        
+
             return;
         }
 
