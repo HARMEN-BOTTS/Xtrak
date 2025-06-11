@@ -27,7 +27,7 @@
                                 N cdt embauchés : <strong> {{ $hiredCount }} </strong>
                             </span>
                         </div>
-                          <div>
+                        <div>
                             <a href="{{ route('trgdashboard') }}" class="me-2 text-black {{ request()->routeIs('trgdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">TRG</a> -
                             <a href="{{ route('dashboard') }}" class="mx-2 text-black {{ request()->routeIs('dashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CDT</a> -
                             <a href="{{ route('oppdashboard') }}" class="mx-2 {{ request()->routeIs('oppdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">OPP</a> -
@@ -37,6 +37,13 @@
                             <a href="{{ route('cstdashboard') }}" class="ms-2 text-black {{ request()->routeIs('cstdashboard.*') ? 'text-decoration-underline fw-bold' : '' }}">CST</a>
                         </div>
                     </div>
+
+
+
+
+
+
+
 
 
                     <div class="button-group-main">
@@ -121,19 +128,28 @@
                                 </a>
                             </div>
 
-                            <div class="d-flex justify-content-end position-relative">
 
-                                <!-- Pagination search at the right corner -->
-                                <div class="pagination-search">
-                                    <div class="d-flex align-items-center">
-                                        <div class="input-group" style="width:180px;">
-                                            <input type="number" class="form-control" wire:model="pageNumberInput" min="1" placeholder="Page">
-                                            <span class="input-group-text">of {{ $totalPages }}</span>
-                                            <button class="btn btn-primary" type="button" wire:click="goToPage">Go</button>
+                            @if (auth()->user()->hasRole('Administrateur'))
+                            <div class="">
+                                <button style="background:#0065F8;color:white;" type="button" class="btn btn-close1" wire:click="openImportModal">
+                                    Import<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i>
+                                </button>
+                                <!-- <button style="background:#FF7601;color:white;" type="button" class="btn btn-close1" wire:click="exportData">
+                                    Export<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i>
+                                </button> -->
+                                <button style="background:#FF7601;color:white;" type="button" class="btn btn-close1" wire:click="exportData" wire:loading.attr="disabled" wire:target="exportData">
+                                    <span wire:loading.remove wire:target="exportData">Export<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></span>
+                                    <span wire:loading wire:target="exportData">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Exporting...</span>
                                         </div>
-                                    </div>
-                                </div>
+                                    </span>
+                                </button>
                             </div>
+                            @endif
+
+
+
 
 
                         </div>
@@ -253,6 +269,9 @@
                     </div>
                 </div>
                 <div style="margin-top:-2%;" class="card-body">
+
+
+
                     @if (session()->has('message'))
                     <div style="width:28%;" class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('message') }}
@@ -269,6 +288,7 @@
                         </small>
                     </div>
                     @endif
+
 
 
                     <div class="table-responsive">
@@ -334,6 +354,17 @@
                                 @endif
                             </tbody>
                         </table>
+                        <div class="mt-3 d-flex justify-content-end position-relative">
+                            <div class="pagination-search">
+                                <div class="d-flex align-items-center">
+                                    <div class="input-group" style="width:180px;">
+                                        <input type="number" class="form-control" wire:model="pageNumberInput" min="1" placeholder="Page">
+                                        <span class="input-group-text">of {{ $totalPages }}</span>
+                                        <button class="btn btn-primary" type="button" wire:click="goToPage">Go</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -554,15 +585,66 @@
         </div>
 
 
+        <div style="margin-top:-60%;" class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content bg-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importModalLabel">Import Excel File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click="closeImportModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form wire:submit.prevent="importData">
+                            <div class="mb-3">
+                                <label for="importFile" class="form-label">Select Excel File</label>
+                                <input type="file" class="form-control" id="importFile" wire:model="importFile" accept=".xlsx,.xls,.csv">
+                                @error('importFile')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
 
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <strong>Supported formats:</strong> .xlsx, .xls, .csv<br>
+                                    <strong>Maximum file size:</strong> 10MB<br>
+                                    <!-- <strong>Required columns:</strong> first_name, last_name<br>
+                                    <strong>Optional columns:</strong> date_ctc, company_ctc, civ, function_ctc, std_ctc, ext_ctc, ld, cell, mail, ctc_code, trg_code, remarks, notes -->
+                                </small>
+                            </div>
 
-
-
-
-
-        <div class="card-footer">
-
+                            <div wire:loading wire:target="importFile" class="text-center mb-3">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span class="ms-2">Processing file...</span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="closeImportModal">Cancel</button>
+                        <button type="button" class="btn btn-success" wire:click="importData" wire:loading.attr="disabled" wire:target="importData">
+                            <span wire:loading.remove wire:target="importData">Upload</span>
+                            <span wire:loading wire:target="importData">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Importing...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             .btn-mcp {
@@ -589,7 +671,7 @@
 
             .button-group-left-main {
                 display: flex;
-                gap: 10px;
+                gap: 3px;
             }
 
             .btn-danger {
@@ -1047,6 +1129,48 @@
     </div>
     @push('page-script')
     <script>
+        document.addEventListener('livewire:initialized', () => {
+            // Listen for modal events
+            Livewire.on('open-import-modal', () => {
+                const importModal = new bootstrap.Modal(document.getElementById('importModal'));
+                importModal.show();
+            });
+
+            Livewire.on('closeModal', (data) => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById(data.modalId));
+                if (modal) {
+                    modal.hide();
+                }
+            });
+
+            // Handle file input change
+            document.getElementById('importFile').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const maxSize = 10 * 1024 * 1024; // 10MB
+
+                    if (file.size > maxSize) {
+                        alert('File size exceeds 10MB limit');
+                        e.target.value = '';
+                        return;
+                    }
+
+                    const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'application/vnd.ms-excel',
+                        'text/csv'
+                    ];
+
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Please select a valid Excel or CSV file');
+                        e.target.value = '';
+                        return;
+                    }
+                }
+            });
+        });
+
+
+
         document.addEventListener('livewire:load', function() {
             Livewire.on('hide-mcplist-button', function() {
                 document.getElementById('mcplistButton').style.display = 'none';
