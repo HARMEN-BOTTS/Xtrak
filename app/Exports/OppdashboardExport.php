@@ -40,7 +40,7 @@ class OppdashboardExport implements FromQuery, WithHeadings, WithMapping, WithCo
         return [
             'ID',
             'Opportunity Date',
-            'Opportunity Code',
+            'Opp Code',
             'Job Titles',
             'Name',
             'Postal Code 1',
