@@ -53,8 +53,11 @@
                                     <i class="fa-regular fa-trash-can fa-lg"></i>
                                 </button>
                                 <button style="background:#4CC9FE;" type="button" class="btn btn-close1"><i class="fa-regular fa-floppy-disk fa-lg"></i></button>
-                                <a href="/landing">
-                                    <button type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+                                <button onclick="history.back()" type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+                            </div>
+                             <div class="">
+                                <a href="/mcpdashboard">
+                                    <button style="border-radius: 50%;" type="button" class="btn btn-close1"><i class="fa-solid fa-arrow-left"></i></button>
                                 </a>
                             </div>
                         </div>
@@ -692,7 +695,7 @@
 
             .button-group-left-main {
                 display: flex;
-                gap: 140px;
+                gap: 100px;
             }
 
             .button-group-right {
