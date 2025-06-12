@@ -10,9 +10,16 @@ use Livewire\WithPagination;
 use App\Models\Trgdashboard;
 use App\Models\McpTrgLink;
 
+// Import/Export related
+use Livewire\WithFileUploads;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\McpdashboardImport;
+use App\Exports\McpdashboardExport;
+
 class Admin extends Component
 {
     use WithPagination;
+    use WithFileUploads;
     protected $paginationTheme = 'bootstrap';
     public $sortField = 'updated_at';
     public $sortDirection = 'desc';
@@ -34,6 +41,70 @@ class Admin extends Component
     protected $rules_trg = [
         'trgCode' => 'required',
     ];
+
+    // Import/Export properties
+    public $showImportModal = false;
+    public $importFile;
+
+    // Import validation rules
+    protected $rules_import = [
+        'importFile' => 'required|mimes:xlsx,xls,csv|max:10240', // 10MB max
+    ];
+
+
+    // Import/Export Methods
+    public function openImportModal()
+    {
+        $this->showImportModal = true;
+        $this->importFile = null;
+        $this->dispatch('open-import-modal');
+    }
+
+    public function closeImportModal()
+    {
+        $this->showImportModal = false;
+        $this->importFile = null;
+        $this->dispatch('closeModal', modalId: 'importModal');
+    }
+
+    public function importData()
+    {
+        $this->validate($this->rules_import);
+
+        try {
+            Excel::import(new McpdashboardImport, $this->importFile->getRealPath());
+
+            $this->closeImportModal();
+            $this->refreshData();
+            $this->dispatch('alert', type: 'success', message: "Data imported successfully!");
+        } catch (\Exception $e) {
+            $this->dispatch('alert', type: 'error', message: "Import failed: " . $e->getMessage());
+        }
+    }
+
+    // public function exportData()
+    // {
+    //     try {
+    //         return Excel::download(new CtcdashboardExport, 'ctc_dashboard_' . date('Y-m-d_H-i-s') . '.xlsx');
+    //     } catch (\Exception $e) {
+    //         $this->dispatch('alert', type: 'error', message: "Export failed: " . $e->getMessage());
+    //     }
+    // }
+
+    public $isExporting = false;
+
+    public function exportData()
+    {
+        $this->isExporting = true;
+
+        try {
+            return Excel::download(new McpdashboardExport, 'mcp_dashboard_' . date('Y-m-d_H-i-s') . '.xlsx');
+        } catch (\Exception $e) {
+            $this->dispatch('alert', type: 'error', message: "Export failed: " . $e->getMessage());
+        } finally {
+            $this->isExporting = false;
+        }
+    }
 
     public $showCheckboxes = false;
 

@@ -119,18 +119,26 @@
                                 </a>
                             </div>
 
-                            <div class="ms-5 d-flex justify-content-end position-relative">
-                                <!-- Pagination search at the right corner -->
-                                <div class="pagination-search">
-                                    <div class="d-flex align-items-center">
-                                        <div class="input-group" style="width:190px;">
-                                            <input type="number" id="page-number-input" class="form-control" placeholder="Page" min="1" max="{{ $this->totalPages }}">
-                                            <span class="input-group-text bg-light">of {{ $this->totalPages }}</span>
-                                            <button class="btn btn-primary" id="go-to-page-btn" type="button">Go</button>
+                            @if (auth()->user()->hasRole('Administrateur'))
+                            <div class="">
+                                <!-- <button style="background:#0065F8;color:white;" type="button" class="btn btn-close1" wire:click="openImportModal">
+                                    Import<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i>
+                                </button> -->
+                                <!-- <button style="background:#FF7601;color:white;" type="button" class="btn btn-close1" wire:click="exportData">
+                                    Export<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i>
+                                </button> -->
+                                <button style="background:#FF7601;color:white;" type="button" class="btn btn-close1" wire:click="exportData" wire:loading.attr="disabled" wire:target="exportData">
+                                    <span wire:loading.remove wire:target="exportData">Export<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></span>
+                                    <span wire:loading wire:target="exportData">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Exporting...</span>
                                         </div>
-                                    </div>
-                                </div>
+                                    </span>
+                                </button>
                             </div>
+                            @endif
+
+
 
                         </div>
                     </div>
@@ -435,13 +443,15 @@
                                 @endforelse
                             </tbody>
                         </table>
+
+
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <div style="margin-top:-1%;" class="d-flex justify-content-end position-relative mb-2" id="exporter">
+        <!-- <div style="margin-top:-1%;" class="d-flex justify-content-end position-relative mb-2" id="exporter">
             <button id="export-button" onclick="exportSelectedCandidates()" class="btn btn-primary position-relative">
                 <i class="ri-file-download-line me-1"></i>
                 <span class="download-text">Exporter</span>
@@ -450,7 +460,20 @@
                     <span class="visually-hidden">Exportation...</span>
                 </span>
             </button>
+        </div> -->
+        <div class="mb-2 d-flex justify-content-end position-relative">
+            <!-- Pagination search at the right corner -->
+            <div class="pagination-search">
+                <div class="d-flex align-items-center">
+                    <div class="input-group" style="width:190px;">
+                        <input type="number" id="page-number-input" class="form-control" placeholder="Page" min="1" max="{{ $this->totalPages }}">
+                        <span class="input-group-text bg-light">of {{ $this->totalPages }}</span>
+                        <button class="btn btn-primary" id="go-to-page-btn" type="button">Go</button>
+                    </div>
+                </div>
+            </div>
         </div>
+
 
 
         <div style="margin-top:-60%;" class="modal fade" id="oppLinkModal" tabindex="-1" aria-labelledby="oppLinkModalLabel" aria-hidden="true" wire:ignore.self>
@@ -520,6 +543,58 @@
 
 
 
+        <div style="margin-top:-60%;" class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content bg-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importModalLabel">Import Excel File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click="closeImportModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form wire:submit.prevent="importData">
+                            <div class="mb-3">
+                                <label for="importFile" class="form-label">Select Excel File</label>
+                                <input type="file" class="form-control" id="importFile" wire:model="importFile" accept=".xlsx,.xls,.csv">
+                                @error('importFile')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <strong>Supported formats:</strong> .xlsx, .xls, .csv<br>
+                                    <strong>Maximum file size:</strong> 10MB<br>
+                                    <!-- <strong>Required columns:</strong> first_name, last_name<br>
+                                    <strong>Optional columns:</strong> date_ctc, company_ctc, civ, function_ctc, std_ctc, ext_ctc, ld, cell, mail, ctc_code, trg_code, remarks, notes -->
+                                </small>
+                            </div>
+
+                            <div wire:loading wire:target="importFile" class="text-center mb-3">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span class="ms-2">Processing file...</span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="closeImportModal">Cancel</button>
+                        <button type="button" class="btn btn-success" wire:click="importData" wire:loading.attr="disabled" wire:target="importData">
+                            <span wire:loading.remove wire:target="importData">Upload</span>
+                            <span wire:loading wire:target="importData">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Importing...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
 
 
 
@@ -529,9 +604,45 @@
     <script>
         let currentlyVisibleCertificateIndex = null;
 
-        function coming() {
-            alert("OPPlist Coming Soon 🛑");
-        }
+        document.addEventListener('livewire:initialized', () => {
+            // Listen for modal events
+            Livewire.on('open-import-modal', () => {
+                const importModal = new bootstrap.Modal(document.getElementById('importModal'));
+                importModal.show();
+            });
+
+            Livewire.on('closeModal', (data) => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById(data.modalId));
+                if (modal) {
+                    modal.hide();
+                }
+            });
+
+            // Handle file input change
+            document.getElementById('importFile').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const maxSize = 10 * 1024 * 1024; // 10MB
+
+                    if (file.size > maxSize) {
+                        alert('File size exceeds 10MB limit');
+                        e.target.value = '';
+                        return;
+                    }
+
+                    const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'application/vnd.ms-excel',
+                        'text/csv'
+                    ];
+
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Please select a valid Excel or CSV file');
+                        e.target.value = '';
+                        return;
+                    }
+                }
+            });
+        });
 
 
         document.addEventListener('livewire:initialized', () => {

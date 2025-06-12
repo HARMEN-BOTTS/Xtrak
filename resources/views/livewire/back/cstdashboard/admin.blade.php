@@ -59,6 +59,24 @@
                                     <button type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
                                 </a>
                             </div>
+                            @if (auth()->user()->hasRole('Administrateur'))
+                            <div class="">
+                                <button style="background:#0065F8;color:white;" type="button" class="btn btn-close1" wire:click="openImportModal">
+                                    Import<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i>
+                                </button>
+                                <!-- <button style="background:#FF7601;color:white;" type="button" class="btn btn-close1" wire:click="exportData">
+                                    Export<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i>
+                                </button> -->
+                                <button style="background:#FF7601;color:white;" type="button" class="btn btn-close1" wire:click="exportData" wire:loading.attr="disabled" wire:target="exportData">
+                                    <span wire:loading.remove wire:target="exportData">Export<i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></span>
+                                    <span wire:loading wire:target="exportData">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Exporting...</span>
+                                        </div>
+                                    </span>
+                                </button>
+                            </div>
+                            @endif
                         </div>
                     </div>
 
@@ -213,7 +231,7 @@
                                     class="{{ in_array($item->id, $selectedRows) ? 'select-row' : '' }} parent-row"
                                     style="cursor: pointer;">
 
-                                    
+
 
                                     <td>{{ $item->date_cst }}</td>
                                     <td>{{ $item->cst_code }}</td>
@@ -435,8 +453,56 @@
             </div>
         </div>
 
-        <div class="card-footer mb-2">
+        <div style="margin-top:-40%;" class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true" wire:ignore.self>
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content bg-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importModalLabel">Import Excel File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click="closeImportModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form wire:submit.prevent="importData">
+                            <div class="mb-3">
+                                <label for="importFile" class="form-label">Select Excel File</label>
+                                <input type="file" class="form-control" id="importFile" wire:model="importFile" accept=".xlsx,.xls,.csv">
+                                @error('importFile')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <strong>Supported formats:</strong> .xlsx, .xls, .csv<br>
+                                    <strong>Maximum file size:</strong> 10MB<br>
+                                    <!-- <strong>Required columns:</strong> first_name, last_name<br>
+                                    <strong>Optional columns:</strong> date_ctc, company_ctc, civ, function_ctc, std_ctc, ext_ctc, ld, cell, mail, ctc_code, trg_code, remarks, notes -->
+                                </small>
+                            </div>
+
+                            <div wire:loading wire:target="importFile" class="text-center mb-3">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span class="ms-2">Processing file...</span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="closeImportModal">Cancel</button>
+                        <button type="button" class="btn btn-success" wire:click="importData" wire:loading.attr="disabled" wire:target="importData">
+                            <span wire:loading.remove wire:target="importData">Upload</span>
+                            <span wire:loading wire:target="importData">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Importing...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
+
+
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             .select-row {
@@ -467,7 +533,7 @@
 
             .button-group-left-main {
                 display: flex;
-                gap: 100px;
+                gap: 40px;
             }
 
             .large-checkbox {
@@ -825,24 +891,66 @@
     @push('page-script')
 
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const buttons = document.querySelectorAll('.toggle-popup');
-    const popup = document.getElementById('popup');
-    const popupBody = document.getElementById('popup-body');
-    const minimizeBtn = document.getElementById('minimize-btn');
-    const maximizeBtn = document.getElementById('maximize-btn');
-    const header = document.getElementById('popup-header');
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            // Listen for modal events
+            Livewire.on('open-import-modal', () => {
+                const importModal = new bootstrap.Modal(document.getElementById('importModal'));
+                importModal.show();
+            });
 
-    buttons.forEach(button => {
-        button.addEventListener('click', function () {
-  const itemData = JSON.parse(this.getAttribute('data-item'));
+            Livewire.on('closeModal', (data) => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById(data.modalId));
+                if (modal) {
+                    modal.hide();
+                }
+            });
 
-  popup.style.width = '100%'; // Ensure enough width
-popup.style.maxWidth = '1000px'; // Limit too-wide layouts
-popup.style.minWidth = '600px'
+            // Handle file input change
+            document.getElementById('importFile').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const maxSize = 10 * 1024 * 1024; // 10MB
 
-  popupBody.innerHTML = `
+                    if (file.size > maxSize) {
+                        alert('File size exceeds 10MB limit');
+                        e.target.value = '';
+                        return;
+                    }
+
+                    const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'application/vnd.ms-excel',
+                        'text/csv'
+                    ];
+
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Please select a valid Excel or CSV file');
+                        e.target.value = '';
+                        return;
+                    }
+                }
+            });
+        });
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.toggle-popup');
+            const popup = document.getElementById('popup');
+            const popupBody = document.getElementById('popup-body');
+            const minimizeBtn = document.getElementById('minimize-btn');
+            const maximizeBtn = document.getElementById('maximize-btn');
+            const header = document.getElementById('popup-header');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemData = JSON.parse(this.getAttribute('data-item'));
+
+                    popup.style.width = '100%'; // Ensure enough width
+                    popup.style.maxWidth = '1000px'; // Limit too-wide layouts
+                    popup.style.minWidth = '600px'
+
+                    popupBody.innerHTML = `
   <div class="container-fluid">
     <div class="row g-3">
       <div class="col-md-3">
@@ -888,77 +996,75 @@ popup.style.minWidth = '600px'
 `;
 
 
-  popup.style.height = 'auto';
-  popup.style.top = '100px';
-  popup.style.left = '100px';
-  popupBody.style.display = 'block';
-  maximizeBtn.textContent = '🗖';
-  popup.style.position = 'absolute';
-  popup.style.display = 'block';
-});
+                    popup.style.height = 'auto';
+                    popup.style.top = '100px';
+                    popup.style.left = '100px';
+                    popupBody.style.display = 'block';
+                    maximizeBtn.textContent = '🗖';
+                    popup.style.position = 'absolute';
+                    popup.style.display = 'block';
+                });
 
-    });
+            });
 
-    // Draggable logic
-    let offsetX, offsetY, isDown = false;
-    header.addEventListener('mousedown', function(e) {
-        isDown = true;
-        offsetX = e.clientX - popup.offsetLeft;
-        offsetY = e.clientY - popup.offsetTop;
-    });
+            // Draggable logic
+            let offsetX, offsetY, isDown = false;
+            header.addEventListener('mousedown', function(e) {
+                isDown = true;
+                offsetX = e.clientX - popup.offsetLeft;
+                offsetY = e.clientY - popup.offsetTop;
+            });
 
-    document.addEventListener('mouseup', () => isDown = false);
-    document.addEventListener('mousemove', function(e) {
-        if (!isDown) return;
-        popup.style.left = `${e.clientX - offsetX}px`;
-        popup.style.top = `${e.clientY - offsetY}px`;
-    });
+            document.addEventListener('mouseup', () => isDown = false);
+            document.addEventListener('mousemove', function(e) {
+                if (!isDown) return;
+                popup.style.left = `${e.clientX - offsetX}px`;
+                popup.style.top = `${e.clientY - offsetY}px`;
+            });
 
-    // Minimize button: toggle popupBody visibility
-    minimizeBtn.addEventListener('click', () => {
-        if (popupBody.style.display === 'none') {
-            popupBody.style.display = 'block';
-            popupBody.style.maxHeight = '70vh';       // set max height
-            popupBody.style.overflowY = 'auto';      // enable vertical scroll if needed
-            minimizeBtn.textContent = '_';
-        } else {
-            popupBody.style.display = 'none';
-            popupBody.style.maxHeight = '';          // reset max height
-            popupBody.style.overflowY = '';          // reset overflow
-            minimizeBtn.textContent = '▭'; // minimized icon
-        }
-    });
+            // Minimize button: toggle popupBody visibility
+            minimizeBtn.addEventListener('click', () => {
+                if (popupBody.style.display === 'none') {
+                    popupBody.style.display = 'block';
+                    popupBody.style.maxHeight = '70vh'; // set max height
+                    popupBody.style.overflowY = 'auto'; // enable vertical scroll if needed
+                    minimizeBtn.textContent = '_';
+                } else {
+                    popupBody.style.display = 'none';
+                    popupBody.style.maxHeight = ''; // reset max height
+                    popupBody.style.overflowY = ''; // reset overflow
+                    minimizeBtn.textContent = '▭'; // minimized icon
+                }
+            });
 
-    // Maximize button: toggle fullscreen/small size
-    maximizeBtn.addEventListener('click', () => {
-        if (popup.style.position === 'fixed') {
-            // Restore to original
-            popup.style.position = 'absolute';
-            popup.style.width = '400px';
-            popup.style.height = 'auto';
-            popup.style.top = '100px';
-            popup.style.left = '100px';
-            maximizeBtn.textContent = '🗖'; // maximize icon
-        } else {
-            // Maximize fullscreen
-            popup.style.position = 'fixed';
-            popup.style.top = '0';
-            popup.style.left = '0';
-            popup.style.width = '70vw';
-            popup.style.height = '70vh';
-            popupBody.style.height = 'calc(100vh - 70px)';
-            popupBody.style.overflowY = 'auto';
-            maximizeBtn.textContent = '🗗'; // restore icon
-        }
-    });
-});
-
-</script>
+            // Maximize button: toggle fullscreen/small size
+            maximizeBtn.addEventListener('click', () => {
+                if (popup.style.position === 'fixed') {
+                    // Restore to original
+                    popup.style.position = 'absolute';
+                    popup.style.width = '400px';
+                    popup.style.height = 'auto';
+                    popup.style.top = '100px';
+                    popup.style.left = '100px';
+                    maximizeBtn.textContent = '🗖'; // maximize icon
+                } else {
+                    // Maximize fullscreen
+                    popup.style.position = 'fixed';
+                    popup.style.top = '0';
+                    popup.style.left = '0';
+                    popup.style.width = '70vw';
+                    popup.style.height = '70vh';
+                    popupBody.style.height = 'calc(100vh - 70px)';
+                    popupBody.style.overflowY = 'auto';
+                    maximizeBtn.textContent = '🗗'; // restore icon
+                }
+            });
+        });
+    </script>
 
 
 
     <script>
-
         document.addEventListener('livewire:initialized', function() {
             Livewire.on('open-opp-modal', () => {
                 var myModal = new bootstrap.Modal(document.getElementById('oppLinkModal'));
