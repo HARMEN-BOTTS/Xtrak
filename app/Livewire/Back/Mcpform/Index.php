@@ -249,10 +249,12 @@ class Index extends Component
                 foreach ($doc->getSections() as $section) {
                     foreach ($section->getElements() as $element) {
                         if (method_exists($element, 'getText')) {
-                            $text .= $element->getText() . "\n\n";
+                            $textPart = $element->getText();
+                            $text .= is_array($textPart) ? implode(" ", $textPart) . "\n\n" : $textPart . "\n\n";
                         }
                     }
                 }
+
             }
 
             // Extract first embedded image (e.g. logo) from Word
@@ -352,8 +354,10 @@ class Index extends Component
             foreach ($section->getElements() as $element) {
                 if (method_exists($element, 'getText')) {
                     $text = $element->getText();
-                    if (!empty(trim($text))) {
-                        $messageTemplate .= $text . "\n\n"; // Add double line breaks between elements
+                    $textString = is_array($text) ? implode(" ", $text) : $text;
+                    if (!empty(trim($textString))) {
+                        $textString = is_array($text) ? implode(" ", $text) : $text;
+                        $messageTemplate .= $textString . "\n\n";
                     }
                 }
                 // Also check for TextRun elements which might contain the actual paragraphs
