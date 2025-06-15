@@ -11,7 +11,5 @@ export default defineConfig({
             refresh: true,
         }),
     ],
-    build: {
-        manifest: true, // Activer la génération du fichier manifest.json
-    },
+    
 });
