@@ -77,21 +77,40 @@
                             </div>
 
                             <!-- Additional Details -->
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">OPPcode</label>
                                 <input type="text" class="form-control" wire:model="tag_source">
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Message</label>
-                                <input type="text" class="form-control" wire:model="message">
-                            </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">Tool</label>
                                 <select class="form-select" wire:model="tool">
                                     <option value="">Select Tool</option>
                                     <option value="MCM">MCM</option>
                                     <option value="Outlook Direct">Outlook Direct</option>
                                 </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">From (sender Email)</label>
+                                <select class="form-select" wire:model="from" wire:change="fetchPasscode">
+                                    <option value="">Select Email</option>
+                                    @foreach($mailOptions as $mail)
+                                    <option value="{{ $mail->email }}">{{ $mail->email }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Email Pass Code Info -->
+                            <div class="col-md-6" hidden>
+                                <label class="form-label">Passcode</label>
+                                <input type="text" class="form-control" wire:model="passcode" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Subject</label>
+                                <input type="text" class="form-control" wire:model="subject">
+                            </div>
+                            <div class="col-md-4" hidden>
+                                <label class="form-label">Message</label>
+                                <input type="text" class="form-control" wire:model="message">
                             </div>
 
                             <!-- File Uploads -->
@@ -113,57 +132,42 @@
                                 <label class="form-label">From (Sender Email)</label>
                                 <input type="email" class="form-control" wire:model="from">
                             </div> -->
-                            <div class="col-md-6">
-                                <label class="form-label">From (sender Email)</label>
-                                <select class="form-select" wire:model="from" wire:change="fetchPasscode">
-                                    <option value="">Select Email</option>
-                                    @foreach($mailOptions as $mail)
-                                    <option value="{{ $mail->email }}">{{ $mail->email }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <!-- Email Pass Code Info -->
-                            <div class="col-md-6" hidden>
-                                <label class="form-label">Passcode</label>
-                                <input type="text" class="form-control" wire:model="passcode" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Subject</label>
-                                <input type="text" class="form-control" wire:model="subject">
-                            </div>
 
                             <!-- Schedule Settings -->
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Launch date</label>
                                 <input type="datetime-local" class="form-control" wire:model="launch_date">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Work time (hh:mm)</label>
+                                <div class="input-group">
+                                    <input type="time" class="form-control" wire:model="work_time_start">
+                                    <input type="time" class="form-control" wire:model="work_time_end">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Status date</label>
+                                <input type="datetime-local" class="form-control" wire:model="status_date">
+                            </div>
+                            <div class="col-md-4">
                                 <label class="form-label">Mail pause time (sec)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" wire:model="pause_min" placeholder="Min">
                                     <input type="number" class="form-control" wire:model="pause_max" placeholder="Max">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Batch Size (min - max)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" wire:model="batch_min" placeholder="Min">
                                     <input type="number" class="form-control" wire:model="batch_max" placeholder="Max">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Batch Pause (min)</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" wire:model="" placeholder="Min">
                                     <input type="number" class="form-control" wire:model="" placeholder="Max">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Work time (hh:mm)</label>
-                                <div class="input-group">
-                                    <input type="time" class="form-control" wire:model="work_time_start">
-                                    <input type="time" class="form-control" wire:model="work_time_end">
                                 </div>
                             </div>
 
@@ -186,10 +190,6 @@
                                     <option value="Paused">Paused</option>
                                     <option value="Cancelled">Cancelled</option>
                                 </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Status date</label>
-                                <input type="datetime-local" class="form-control" wire:model="status_date">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Target type</label>
