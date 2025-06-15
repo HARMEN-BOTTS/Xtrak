@@ -959,7 +959,7 @@
 
             .button-group-left-main {
                 display: flex;
-                gap: 15px;
+                gap: 10px;
             }
 
             .button-group-right {

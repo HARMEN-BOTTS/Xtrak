@@ -1293,7 +1293,7 @@
 
         .button-group-left {
             display: flex;
-            gap: 60px;
+            gap: 40px;
         }
 
         .btn-close1 {

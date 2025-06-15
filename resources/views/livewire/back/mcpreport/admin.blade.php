@@ -28,7 +28,12 @@
                     <div class="card-header-modern">
                         <div class="header-content">
                             <div class="title-section">
-                                <h4 class="report-title">MCM Report Code : {{ $mcpCode }}</h4>
+                                <h6 class="report-title">MCM Report :   <input style="width:140px; padding:1px;" type="text" placeholder="{{  $mcpCode ?? '--' }}"></input>
+                                <input style="width:200px; padding:1px;" type="text" placeholder="{{ $campaignInfo->designation ?? '--' }}"></input>
+                                <a href="/mcpdashboard">
+                                    <button style="border-radius: 50%;" type="button" class="btn btn-close1"><i class="fa-solid fa-arrow-left"></i></button>
+                                </a>
+                            </h6>
                                 <div class="campaign-info">
                                     <span class="campaign-subject">Campaign Subject : {{ $campaignInfo->subject?? 'N/A' }}</span>
                                 </div>
@@ -104,6 +109,15 @@
     </div>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .btn-close1{
+            background-color: #000080;
+            color: white;
+        }
+
+        .btn-close1:hover {
+                background-color: #000080;
+                color: white;
+        }
         .card {
             background: #ffffff;
             border-radius: 12px;
@@ -135,13 +149,13 @@
 
         .report-title {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: white;
         }
 
         .campaign-info {
-            margin-top: 4px;
+            margin-top: 10px;
         }
 
         .campaign-subject {

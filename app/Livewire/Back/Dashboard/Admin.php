@@ -23,6 +23,9 @@ use App\Models\CdtOppLink; // We'll create this model
 use App\Models\Mcpdashboard; // Add this
 use App\Models\CdtMcpLink; // We'll create this model
 
+// Event : 
+use App\Models\CdtEvent;
+
 
 // Import/Export related
 use Livewire\WithFileUploads;
@@ -144,6 +147,12 @@ class Admin extends Component
             $this->isExporting = false;
         }
     }
+
+    // Event : 
+
+    public $showEventModal = false;
+    public $eventFormData = [];
+
 
 
     public $totalPages = 0;
@@ -658,10 +667,10 @@ class Admin extends Component
             $query->where('name', 'Attente');
         })->count();
     }
-    public function updated($propertyName)
-    {
-        session()->put($propertyName, $this->{$propertyName});
-    }
+    // public function updated($propertyName)
+    // {
+    //     session()->put($propertyName, $this->{$propertyName});
+    // }
 
     // Row selection 
 
@@ -1012,6 +1021,157 @@ class Admin extends Component
         $this->closeMcpModal();
         $this->dispatch('closeModal', modalId: 'mcpLinkModal');
     }
+
+
+    // Event : 
+
+    // Add these methods
+    public function openEventModal()
+    {
+        if (empty($selectedIds) && empty($this->selectedCandidateId)) {
+            $this->dispatch('alert', type: 'error', message: "Please select at least one row to create event");
+            return;
+        }
+
+        // Get the first selected row data to populate form
+        $selectedItem = Candidate::find($this->selectedCandidateId[0]);
+
+        if ($selectedItem) {
+            $this->eventFormData = [
+                'cdt_id' => $selectedItem->id,
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'feed' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+            ];
+        }
+
+        $this->showEventModal = true;
+        $this->dispatch('open-event-modal');
+    }
+
+    public function closeEventModal()
+    {
+        $this->showEventModal = false;
+        $this->eventFormData = [];
+        $this->dispatch('close-event-modal');
+    }
+
+    public function saveEvent()
+    {
+        // $this->validate([
+        //     'eventFormData.event_date' => 'required|date',
+        //     'eventFormData.type' => 'required',
+        // ]);
+
+        CdtEvent::create([
+            'cdt_id' => $this->eventFormData['cdt_id'],
+            'event_date' => $this->eventFormData['event_date'],
+            'type' => $this->eventFormData['type'],
+            'io' => $this->eventFormData['io'],
+            'object' => $this->eventFormData['object'],
+            'status' => $this->eventFormData['status'],
+            'feed' => $this->eventFormData['feed'],
+            'temper' => $this->eventFormData['temper'],
+            'comment' => $this->eventFormData['comment'],
+            'next' => $this->eventFormData['next'],
+            'ech' => $this->eventFormData['ech'],
+            'priority' => $this->eventFormData['priority'],
+            'last_comment' => $this->eventFormData['last_comment'],
+            'date_last_comment' => $this->eventFormData['date_last_comment'],
+            'other_comment' => $this->eventFormData['other_comment'],
+            'note1' => $this->eventFormData['note1'],
+        ]);
+
+        $this->dispatch('alert', type: 'success', message: "Event created successfully");
+        $this->closeEventModal();
+    }
+
+    public function showEventList()
+    {
+        if (empty($this->selectedCandidateId)) {
+            // Show all events
+            redirect()->route('cdtevtlist');
+            return;
+        }
+
+        $eventDataCount = CdtEvent::whereIn('cdt_id', $this->selectedCandidateId)->count();
+
+
+        if ($eventDataCount === 0) {
+            $this->dispatch('alert', type: 'error', message: "No event created for selected row");
+            return;
+        }
+
+        // Show events for selected rows
+        redirect()->route('cdtevtlist', ['selectedRows' => $this->selectedCandidateId]);
+    }
+
+    public function resetEventForm()
+    {
+        $selectedItem = null;
+        if (!empty($this->selectedCandidateId)) {
+            $selectedItem = Candidate::find($this->selectedCandidateId[0]);
+        }
+
+        if ($selectedItem) {
+
+            $this->eventFormData = [
+                'cdt_id' => $selectedItem->id,
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'feed' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+            ];
+        } else {
+            $this->eventFormData = [
+                'cdt_id' => '',
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'feed' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+            ];
+        }
+
+        $this->dispatch('alert', type: 'info', message: "Form has been reset");
+        $this->dispatch('form-reset');
+    }
+
+
+
 
 
 

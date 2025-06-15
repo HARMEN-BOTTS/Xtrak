@@ -11,6 +11,9 @@ use Livewire\WithPagination;
 use App\Models\Mcpdashboard;
 use App\Models\CtcMcpLink;
 
+// Event : 
+use App\Models\CtcEvent;
+
 // Import/Export related
 use Livewire\WithFileUploads;
 use Maatwebsite\Excel\Facades\Excel;
@@ -108,6 +111,12 @@ class Admin extends Component
             $this->isExporting = false;
         }
     }
+
+      // Event : 
+
+    public $showEventModal = false;
+    public $eventFormData = [];
+
 
 
 
@@ -322,6 +331,159 @@ class Admin extends Component
         $this->closeMcpModal();
         $this->dispatch('closeModal', modalId: 'mcpLinkModal');
     }
+
+
+      
+    // Event : 
+
+
+    // Add these methods
+    public function openEventModal()
+    {
+        if (empty($this->selectedRows)) {
+            $this->dispatch('alert', type: 'error', message: "Please select at least one row to create event");
+            return;
+        }
+
+        // Get the first selected row data to populate form
+        $selectedItem = Ctcdashboard::find($this->selectedRows[0]);
+
+        if ($selectedItem) {
+            $this->eventFormData = [
+                'ctc_id' => $selectedItem->id,
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'feed' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+            ];
+        }
+
+        $this->showEventModal = true;
+        $this->dispatch('open-event-modal');
+    }
+
+    public function closeEventModal()
+    {
+        $this->showEventModal = false;
+        $this->eventFormData = [];
+        $this->dispatch('close-event-modal');
+    }
+
+    public function saveEvent()
+    {
+        // $this->validate([
+        //     'eventFormData.event_date' => 'required|date',
+        //     'eventFormData.type' => 'required',
+        // ]);
+
+        CtcEvent::create([
+            'ctc_id' => $this->eventFormData['ctc_id'],
+            'event_date' => $this->eventFormData['event_date'],
+            'type' => $this->eventFormData['type'],
+            'io' => $this->eventFormData['io'],
+            'object' => $this->eventFormData['object'],
+            'status' => $this->eventFormData['status'],
+            'feed' => $this->eventFormData['feed'],
+            'temper' => $this->eventFormData['temper'],
+            'comment' => $this->eventFormData['comment'],
+            'next' => $this->eventFormData['next'],
+            'ech' => $this->eventFormData['ech'],
+            'priority' => $this->eventFormData['priority'],
+            'last_comment' => $this->eventFormData['last_comment'],
+            'date_last_comment' => $this->eventFormData['date_last_comment'],
+            'other_comment' => $this->eventFormData['other_comment'],
+            'note1' => $this->eventFormData['note1'],
+        ]);
+
+        $this->dispatch('alert', type: 'success', message: "Event created successfully");
+        $this->closeEventModal();
+    }
+
+    public function showEventList()
+    {
+        if (empty($this->selectedRows)) {
+            // Show all events
+            redirect()->route('ctcevtlist');
+            return;
+        }
+
+        $eventDataCount = CtcEvent::whereIn('ctc_id', $this->selectedRows)->count();
+
+
+        if ($eventDataCount === 0) {
+            $this->dispatch('alert', type: 'error', message: "No event created for selected row");
+            return;
+        }
+
+        // Show events for selected rows
+        redirect()->route('ctcevtlist', ['selectedRows' => $this->selectedRows]);
+    }
+
+    public function resetEventForm()
+    {
+        $selectedItem = null;
+        if (!empty($this->selectedRows)) {
+            $selectedItem = Ctcdashboard::find($this->selectedRows[0]);
+        }
+
+        if ($selectedItem) {
+
+            $this->eventFormData = [
+                'ctc_id' => $selectedItem->id,
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'feed' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+            ];
+        } else {
+            $this->eventFormData = [
+                'ctc_id' => '',
+                'event_date' => date('Y-m-d'),
+                'type' => '',
+                'io' => '',
+                'object' => '',
+                'status' => '',
+                'feed' => '',
+                'comment' => '',
+                'next' => '',
+                'ech' => '',
+                'priority' => '',
+                'last_comment' => '',
+                'date_last_comment' => date('Y-m-d'),
+                'other_comment' => '',
+                'note1' => '',
+                'temper' => '',
+            ];
+        }
+
+        $this->dispatch('alert', type: 'info', message: "Form has been reset");
+        $this->dispatch('form-reset');
+    }
+
+
+
 
 
 

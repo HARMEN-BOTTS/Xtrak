@@ -69,10 +69,8 @@
 
 
                             <div class="one">
-                                <a href="/cdtevtlist">
-                                    <button type="button" class="btn btn-evt">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
-                                </a>
-                                <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
+                                <button type="button" class="btn btn-evt" wire:click="showEventList()">EVT <i style="margin-left:5px;" class="fa-regular fa-file-lines"></i> </button>
+                                <button type="button" class="btn btn-evt" wire:click="openEventModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
                             </div>
 
 
@@ -592,9 +590,139 @@
         </div>
 
 
+        <div id="evtModal" class="modal1" style="display: {{ $showEventModal ? 'block' : 'none' }};">
+            <div class="modal-content1">
+                <div class="modal-header1">
+                    <h2 style="background:yellow;width:18%;padding:7px;text-align:center">CDT_EVTform</h2>
+                </div>
+                <div class="icons-row">
+                    <div class="icon-item">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="icon-item">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="icon-item">
+                        <i class="fas fa-pen"></i>
+                    </div>
+                    <div class="icon-item">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div class="icon-item">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="status-buttons">
+                    <button class="status-btn">OCC</button>
+                    <button class="status-btn">NRP</button>
+                    <button class="status-btn">NRJ</button>
+                    <button class="status-btn">WRN</button>
+                    <button class="status-btn">NHS</button>
+                </div>
+
+                <div id="evtForm">
+                    <div class="form-row">
+                        <div class="form-group date-field">
+                            <label>Date</label>
+                            <input type="date" class="form-control1" wire:model="eventFormData.event_date" value="">
+                        </div>
+                        <div class="form-group type-field">
+                            <label>Type</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.type" value="">
+                        </div>
+                        <div class="form-group io-field">
+                            <label>I/O</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.io" value="">
+                        </div>
+                        <div class="form-group objet-field">
+                            <label>Objet</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.object" value="">
+                        </div>
+                        <div class="form-group statut-field">
+                            <label>EVTStatus</label>
+                            <input type="text" class="form-control1" wire:model="eventFormData.status" value="">
+                        </div>
+                        <div class="form-group retour-field">
+                            <label>Feed</label>
+                            <input type="text" wire:model="eventFormData.feed" class="form-control1">
+                        </div>
+                        <div class="form-group statut-field">
+                            <label>Temper</label>
+                            <input type="text" wire:model="eventFormData.temper" class="form-control1">
+                        </div>
+                    </div>
+
+                    <div class="comment-section">
+                        <div class="form-group comment-field">
+                            <label>Comment</label>
+                            <!-- <textarea class="form-control2"></textarea> -->
+                            <input type="text" wire:model="eventFormData.comment" class="form-control1">
+                        </div>
+                        <div class="right-section">
+                            <div class="next-ech-row">
+                                <div class="form-group next-field">
+                                    <label>Next</label>
+                                    <input type="text" wire:model="eventFormData.next" class="form-control1">
+                                </div>
+                                <div class="form-group ech-field">
+                                    <label>Ech</label>
+                                    <input type="text" wire:model="eventFormData.ech" class="form-control1">
+                                </div>
+                                <div class="form-group ech-field">
+                                    <label>Priority</label>
+                                    <input type="text" wire:model="eventFormData.priority" class="form-control1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
 
 
+                    <div class="comment-section">
+                        <div class="form-group retour-field">
+                            <label>Last Comment</label>
+                            <input type="text" wire:model="eventFormData.last_comment" class="form-control1">
+                        </div>
+                        <div class="right-section">
+                            <div class="next-ech-row">
+                                <div class="form-group last-field">
+                                    <label>Date Last Com.</label>
+                                    <input type="date" wire:model="eventFormData.date_last_comment" class="form-control1">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label>Other Comment</label>
+                            <textarea wire:model="eventFormData.other_comment" class="form-control1"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Note1</label>
+                            <textarea wire:model="eventFormData.note1" class="form-control1"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <div class="button-group-left">
+                            <div class="one">
+                                <button type="button" class="btn btn-evt" wire:click="showEventList()">EVTlist</button>
+                                <a href="/dashboard">
+                                    <button type="button" class="btn btn-evt"> > New</button>
+                                </a>
+                            </div>
+                            <div class="two">
+                                <!-- <button type="button" class="btn btn-valid">Valid</button> -->
+                                <button type="button" class="btn btn-inputmain" wire:click="saveEvent()">Save</button>
+                            </div>
+                            <div class="three">
+                                <button type="button" class="btn btn-erase" wire:click="resetEventForm">Erase</button>
+                                <button type="button" class="btn btn-close1" wire:click="closeEventModal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
 
@@ -1112,7 +1240,18 @@
             background-color: #6F61C0;
             color: white;
         }
+        
 
+         .btn-inputmain {
+            background-color: #06D001;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-inputmain:hover {
+            background-color: #06D001;
+            color: white;
+        }
 
         .btn-close1 {
             background-color: #000080;
@@ -1193,6 +1332,289 @@
             font-size: 15px;
             color: #666;
             padding: 2px 0;
+        }
+
+        .modal-overlay1 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+        }
+
+        .modal-content1 {
+            background: none;
+            border-radius: 8px;
+            width: 300px;
+            text-align: left;
+        }
+
+        .modal-content1 {
+            background: none;
+            border-radius: 8px;
+            width: 300px;
+            text-align: left;
+        }
+
+        .modal1 {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+        }
+
+        .modal-content1 {
+            position: relative;
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px 25px;
+            width: 80%;
+            max-width: 900px;
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header1 {
+            margin-bottom: 5px;
+            margin-left: -12px;
+        }
+
+        .modal-header1 h2 {
+            color: #333;
+            font-size: 1.4em;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+
+        .icons-row {
+            display: flex;
+            gap: 25px;
+            margin-top: 5px;
+            margin-bottom: -20px;
+            padding-left: 5px;
+        }
+
+        .icon-item {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #ddd;
+            margin: 12px 0;
+        }
+
+        .status-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: -5px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            justify-content: flex-end;
+        }
+
+        .status-btn {
+            padding: 2px 8px;
+            border: none;
+            text-decoration: underline;
+            background: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .date-field {
+            width: 90px;
+        }
+
+        .type-field {
+            width: 60px;
+        }
+
+        .io-field {
+            width: 60px;
+        }
+
+        .date-field {
+            width: 115px;
+        }
+
+        .objet-field {
+            width: 200px;
+        }
+
+        .retour-field {
+            width: 200px;
+        }
+
+        .statut-field {
+            width: 80px;
+        }
+
+        .comment-section {
+            display: flex;
+            gap: 15px;
+        }
+
+        .comment-field {
+            flex: 1;
+            max-width: 60%;
+        }
+
+        .right-section {
+            flex: 1;
+            max-width: 40%;
+        }
+
+        .next-ech-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .next-field,
+        .ech-field {
+            flex: 1;
+        }
+
+        label {
+            color: black;
+        }
+
+        .form-control1 {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            background-color: #f8f8f8;
+        }
+
+        .form-control2 {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            background-color: #f8f8f8;
+        }
+
+        textarea.form-control1 {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        textarea.form-control2 {
+            min-height: 177px;
+            resize: vertical;
+        }
+
+        .button-group-main {
+            display: flex;
+            justify-content: space-between;
+            /* margin-top: -55px; */
+            margin-bottom: 20px;
+            margin-left: 50px;
+            padding: 0 20px;
+        }
+
+        .button-group-left-main {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn-erase {
+            background-color: #ff5722;
+            color: white;
+        }
+
+        .btn-valid {
+            background-color: #6F61C0;
+            color: white;
+        }
+
+        .btn-valid:hover {
+            background-color: #6F61C0;
+            color: white;
+        }
+
+        .btn-validmain {
+            background-color: #6F61C0;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-validmain:hover {
+            background-color: #6F61C0;
+            color: white;
+        }
+
+        .btn-erase:hover {
+            background-color: #ff5722;
+            color: white;
+        }
+
+        .btn-historique {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .btn-historique:hover {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .btn-close1 {
+            background-color: #000080;
+            color: white;
+        }
+
+        .btn-close1:hover {
+            background-color: #000080;
+            color: white;
+        }
+
+
+        .evt-button {
+            background: #FF77B7;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .evt-button i {
+            font-size: 14px;
         }
     </style>
 </div>

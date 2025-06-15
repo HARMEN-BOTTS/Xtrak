@@ -144,10 +144,10 @@ class Admin extends Component
     public function updateEvent()
     {
         // Validate the form data
-        $this->validate([
-            'eventFormData.event_date' => 'required|date',
-            'eventFormData.type' => 'required',
-        ]);
+        // $this->validate([
+        //     'eventFormData.event_date' => 'required|date',
+        //     'eventFormData.type' => 'required',
+        // ]);
 
         $event = TrgEvent::find($this->editingEventId);
 

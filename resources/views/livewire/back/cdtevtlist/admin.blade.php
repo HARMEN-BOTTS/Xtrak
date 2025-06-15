@@ -29,25 +29,28 @@
                     <div class="button-group-main">
                         <div class="button-group-left-main">
                             <h5 style="margin-left:-22px; background-color:yellow; border-radius:5px; color:black;padding:12px;margin-top:-2px">CDT_EVTlist</h5>
+                            @if($data->count() == 1)
+                            @foreach($data as $item)
                             <div class="mt-1">
-                                <!-- <label for="trgcode">OPPcode</label> -->
-                                <input style="width:70px; padding:5px;" type="text" placeholder="CDTcode"></input>
+                                <input style="width:90px; padding:5px;" type="text" placeholder="{{ $item->cdtDashboard->code_cdt ?? '--' }}"></input>
                             </div>
                             <div class="mt-1">
-                                <!-- <label for="ctc-prenom">Libellé poste</label> -->
-                                <input style="width:85px;padding:5px;" type="text" placeholder="First name"></input>
-
+                                <input style="width:120px;padding:5px;" type="text" placeholder="{{ $item->cdtDashboard->first_name ?? '--' }}"></input>
                             </div>
                             <div class="mt-1">
-                                <!-- <label for="ctc-nom">Société</label> -->
-                                <input style="width:85px;padding:5px;" type="text" placeholder="Last name"></input>
-
+                                <input style="width:120px;padding:5px;" type="text" placeholder="{{ $item->cdtDashboard->last_name ?? '--' }}"></input>
                             </div>
+                            @endforeach
+                            @else
+                            <div class="mt-2">
+                                <h5>ALL OPEN STATUS CDTS EVENTS</h5>
+                            </div>
+                            @endif
                             <div class="one">
                                 <button type="button" class="btn btn-evt" onclick="openModal()">EVT <i style="margin-left:5px;" class="fa-regular fa-square-plus"></i></button>
                             </div>
                             <div class="three">
-                            <button wire:click="" id="delete-button-container" style="background:#F93827;" class="btn btn-danger">
+                            <button wire:click="deleteSelected()" id="delete-button-container" style="background:#F93827;" class="btn btn-danger">
                                     <i class="fa-regular fa-trash-can fa-lg"></i>
                                 </button>
                                 <button style="background:#4CC9FE;" type="button" class="btn btn-close1"><i class="fa-regular fa-floppy-disk fa-lg"></i></button>
@@ -185,52 +188,47 @@
                                     <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Comment</th>
                                     <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Next</th>
                                     <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Ech</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Cre. date</th>
+                                    <th class="reg_col" scope="col" style="background-color:#F9C0AB;">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                           <tbody>
                                 @if(!empty($data) && (is_array($data) || is_object($data)) && count($data) > 0)
                                 @foreach($data as $item)
-                                <tr>
-                                    <!-- <td>{{ $item->creation_date }}</td>
-                                    <td>{{ $item->company }}</td>
-                                    <td>{{ $item->standard_phone }}</td>
-                                    <td>{{ $item->postal_code_department }}</td>
-                                    <td>{{ $item->title }}</td>
-                                    <td>{{ $item->first_name }}</td>
-                                    <td>{{ $item->last_name }}</td>
-                                    <td>{{ $item->position }}</td>
-                                    <td>{{ $item->email }}</td>
-                                    <td>{{ $item->mobile }}</td>
+                                <tr wire:key="row-{{ $item->id }}"
+                                    wire:click="toggleSelect({{ $item->id }})"
+                                    wire:dblclick="editRow({{ $item->id }})"
+                                    class="{{ in_array($item->id, $selectedRows) ? 'select-row' : '' }}"
+                                    style="cursor: pointer;">
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" class="candidate-checkbox" style="display:none;pointer-events: none;">
+                                    </td>
                                     <td>{{ $item->event_date }}</td>
                                     <td>{{ $item->type }}</td>
-                                    <td>{{ $item->subject }}</td>
-                                    <td>{{ $item->event_status }}</td>
-                                    <td>{{ $item->comment_trg }}</td>
-                                    <td>{{ $item->next_step }}</td> -->
-                                    <td class="checkbox-cell">
-                                        <input type="checkbox" class="candidate-checkbox"
-                                            style="display:none;pointer-events: none;">
+                                    <td>{{ $item->io }}</td>
+                                    <td>{{ $item->cdtDashboard->first_name ?? '' }}</td>
+                                    <td>{{ $item->cdtDashboard->last_name ?? '' }}</td>
+                                    <td>{{ $item->object }}</td>
+                                    <td>{{ $item->status }}</td>
+                                    <td>{{ $item->comment }}</td>
+                                    <td>{{ $item->next }}</td>
+                                    <td>{{ $item->ech }}</td>
+                                    <td>{{ $item->created_at->format('d/m/y') }}</td>
+                                    <td>
+                                        <button
+                                            class="btn btn-sm btn-danger"
+                                            onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this event ⚠')) { @this.deleteEvent({{ $item->id }}); }">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-
                                 </tr>
                                 @endforeach
                                 @else
                                 <tr>
-                                    <td colspan="16" class="text-center">No data available</td>
+                               <td colspan="13" class="text-center">No events available</td>
                                 </tr>
                                 @endif
                             </tbody>
-
                         </table>
                     </div>
                 </div>
@@ -280,13 +278,13 @@
             </div>
         </div>
 
-
-        <div id="evtModal" class="modal">
+        @if($showEventModal)
+        <div id="evtModal" class="modal" style="display: block;">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 style="background:#FFB4A2;width:18%;padding:7px;text-align:center">TRG_EVTform</h2>
                 </div>
-                <div class="icons-row">
+              <div class="icons-row">
                     <div class="icon-item">
                         <i class="fas fa-phone"></i>
                     </div>
@@ -312,60 +310,35 @@
                 </div>
 
                 <div id="evtForm">
-                    <div class="form-row">
-                        <div class="form-group statut-field">
-                            <label>TRG_Code</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group objet-field">
-                            <label>Company</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group statut-field">
-                            <label>CTC_Code</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group retour-field">
-                            <label>First Name </label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group retour-field">
-                            <label>Last Name</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                        <div class="form-group statut-field">
-                            <label>Function</label>
-                            <input type="text" class="form-control1">
-                        </div>
-                    </div>
+                   
                     <div class="form-row">
                         <div class="form-group date-field">
                             <label>Date</label>
-                            <input type="date" class="form-control1" value="">
+                            <input type="date" wire:model="eventFormData.event_date" class="form-control1" value="">
                         </div>
                         <div class="form-group type-field">
                             <label>Type</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" wire:model="eventFormData.type" class="form-control1">
                         </div>
                         <div class="form-group io-field">
                             <label>I/O</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" wire:model="eventFormData.io" class="form-control1">
                         </div>
                         <div class="form-group objet-field">
                             <label>Objet</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" wire:model="eventFormData.object" class="form-control1">
                         </div>
                         <div class="form-group statut-field">
-                            <label>Statut</label>
-                            <input type="text" class="form-control1">
+                            <label>EVTStatus</label>
+                            <input type="text" wire:model="eventFormData.status" class="form-control1">
                         </div>
-                        <div class="form-group retour-field">
-                            <label>Retour</label>
-                            <input type="text" class="form-control1">
+                         <div class="form-group objet-field">
+                            <label>Feed</label>
+                            <input type="text" wire:model="eventFormData.feed" class="form-control1">
                         </div>
                         <div class="form-group statut-field">
                             <label>Temper</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" wire:model="eventFormData.temper" class="form-control1">
                         </div>
                     </div>
 
@@ -373,21 +346,21 @@
                         <div class="form-group comment-field">
                             <label>Comment</label>
                             <!-- <textarea class="form-control2"></textarea> -->
-                            <input type="text" class="form-control1">
+                            <input type="text" wire:model="eventFormData.comment" class="form-control1">
                         </div>
                         <div class="right-section">
                             <div class="next-ech-row">
                                 <div class="form-group next-field">
                                     <label>Next</label>
-                                    <input type="text" class="form-control1">
+                                    <input type="text" wire:model="eventFormData.next" class="form-control1">
                                 </div>
                                 <div class="form-group ech-field">
                                     <label>Ech</label>
-                                    <input type="text" class="form-control1">
+                                    <input type="text" wire:model="eventFormData.ech" class="form-control1">
                                 </div>
                                 <div class="form-group ech-field">
                                     <label>Priority</label>
-                                    <input type="text" class="form-control1">
+                                    <input type="text" wire:model="eventFormData.priority" class="form-control1">
                                 </div>
                             </div>
                         </div>
@@ -398,46 +371,54 @@
                     <div class="comment-section">
                         <div class="form-group retour-field">
                             <label>Last Comment</label>
-                            <input type="text" class="form-control1">
+                            <input type="text" wire:model="eventFormData.last_comment" class="form-control1">
                         </div>
                         <div class="right-section">
                             <div class="next-ech-row">
                                 <div class="form-group last-field">
                                     <label>Date Last Com.</label>
-                                    <input type="text" class="form-control1">
+                                    <input type="date" wire:model="eventFormData.date_last_comment" class="form-control1">
                                 </div>
                             </div>
 
                         </div>
                         <div class="form-group">
                             <label>Other Comment</label>
-                            <textarea class="form-control1"></textarea>
+                            <textarea wire:model="eventFormData.other_comment" class="form-control1"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Note1</label>
-                            <textarea class="form-control1"></textarea>
+                            <textarea wire:model="eventFormData.note1" class="form-control1"></textarea>
                         </div>
                     </div>
 
                     <div class="button-group">
                         <div class="button-group-left">
-                            <div class="one">
-                                <button type="button" class="btn btn-evt">EVTlist</button>
-                                <button type="button" class="btn btn-evt"> > New</button>
+                           <div class="one">
+                                <button type="button" class="btn btn-evt" wire:click="closeEventModal">EVTlist</button>
+                                <a href="/dashboard">
+                                    <button type="button" class="btn btn-evt"> > New</button>
+                                </a>
                             </div>
                             <div class="two">
-                                <button type="button" class="btn btn-valid">Valid</button>
-                                <button type="button" class="btn btn-inputmain">Input</button>
+                                <button type="button" class="btn btn-valid"
+                                    wire:click="validateEventForm">
+                                    Valid
+                                </button>
+                                <button type="button" class="btn btn-inputmain" wire:click="saveEvent">Save</button>
                             </div>
                             <div class="three">
-                                <button type="button" class="btn btn-erase" onclick="eraseForms()">Erase</button>
-                                <button type="button" class="btn btn-close1" onclick="closeModal()">Close</button>
+                                <button type="button" class="btn btn-erase"
+                                    wire:click="resetEventForm">Erase</button>
+                                <button type="button" class="btn btn-close1"
+                                    wire:click="closeEventModal">Close</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        @endif
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
@@ -447,6 +428,9 @@
                 cursor: pointer;
                 margin-top: 3px;
                 margin-left: 10px;
+            }
+            .select-row {
+                background-color: #37AFE1 !important;
             }
 
             .btn-danger {
@@ -697,7 +681,7 @@
 
             .button-group-left-main {
                 display: flex;
-                gap: 120px;
+                gap: 60px;
             }
 
             .button-group-right {
@@ -838,7 +822,7 @@
 
             .cdt-message {
                 font-size: 15px;
-                color: #666;
+          endif66;
                 padding: 2px 0;
             }
         </style>

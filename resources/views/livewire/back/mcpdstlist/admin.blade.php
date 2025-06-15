@@ -37,6 +37,9 @@
                             <div class="mt-1">
                                 <input style="width:120px;padding:5px;" type="text" placeholder="{{ $link->opportunity->designation ?? '--' }}"></input>
                             </div>
+                            <div class="mt-1">
+                                <input style="width:120px;padding:5px;" type="text" placeholder="{{ $link->opportunity->target_status ?? '--' }}"></input>
+                            </div>
                             @endforeach
                             @else
                             <div class="mt-2">
@@ -48,8 +51,9 @@
                                     <i class="fa-regular fa-trash-can fa-lg"></i>
                                 </button>
                                 <button style="background:#4CC9FE;" type="button" class="btn btn-close1"><i class="fa-regular fa-floppy-disk fa-lg"></i></button>
-                                <a href="/landing">
-                                    <button type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+                                <button onclick="history.back()" type="button" class="btn btn-close1"><i class="fas fa-times fa-lg"></i></button>
+                                <a href="/mcpdashboard">
+                                    <button style="border-radius: 50%;" type="button" class="btn btn-back"><i class="fa-solid fa-arrow-left"></i></button>
                                 </a>
                             </div>
                         </div>
@@ -173,7 +177,7 @@
                                     <th style="width:2%;background-color:#DBDBDB;" scope="col"><input type="checkbox" id="select-all-checkbox" class="candidate-checkbox"
                                             style="display:none;" wire:model="selectAll"></th>
                                     <th class="cdt_col" scope="col" style="background-color:#DBDBDB;">Date</th>
-                                    <th class="reg_col" scope="col" style="background-color:#DBDBDB;">CampName</th>
+                                    <th class="reg_col" scope="col" style="background-color:#DBDBDB;width:200px;">Recipient</th>
                                     <th class="reg_col" scope="col" style="background-color:#DBDBDB;">Dest. name</th>
                                     <th class="reg_col" scope="col" style="background-color:#DBDBDB;">Mail</th>
                                     <th class="reg_col" scope="col" style="background-color:#DBDBDB;">Status</th>
@@ -197,7 +201,19 @@
                                             style="display:none;pointer-events: none;">
                                     </td>
                                     <td>{{ $link->candidate->creation_date ?? '--'}}</td>
-                                    <td>{{ $link->candidate->company ?? '--'}}</td>
+                                    <!-- <td>{{ $link->candidate->first_name ?? '--'}}{{ " " }}{{ $link->candidate->last_name ?? '--'}}</td> -->
+                                    <td>
+                                        @if($link->opportunity->target_status == 'CDT')
+                                            {{ $link->candidate->first_name ?? '--' }} {{ $link->candidate->last_name ?? '--' }}
+                                        @elseif(in_array($link->opportunity->target_status, ['TRG', 'CTC']))
+                                            {{ $link->candidate->first_name ?? '--' }} {{ $link->candidate->last_name ?? '--' }}
+                                            @if($link->candidate->company)
+                                                 {{ $link->candidate->company }}
+                                            @endif
+                                        @else
+                                            {{ $link->candidate->first_name ?? '--' }} {{ $link->candidate->last_name ?? '--' }}
+                                        @endif
+                                    </td>
                                     <td>{{ $link->opportunity->designation ?? '--'}}</td>
                                     <td>{{ $link->candidate->email ?? '--'}}</td>
                                     <td>{{ $link->candidate->trg_status ?? '--'}}</td>
@@ -692,7 +708,7 @@
 
             .button-group-left-main {
                 display: flex;
-                gap: 210px;
+                gap: 100px;
             }
 
             .button-group-right {
@@ -745,6 +761,18 @@
             }
 
             .btn-close1:hover {
+                background-color: #000080;
+                color: white;
+            }
+
+
+            .btn-back {
+                background-color: #000080;
+                color: white;
+                margin-left: 10px;
+            }
+
+            .btn-back:hover {
                 background-color: #000080;
                 color: white;
             }

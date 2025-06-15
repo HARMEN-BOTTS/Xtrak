@@ -1523,7 +1523,7 @@
 
     .button-group-left-main {
         display: flex;
-        gap: 30px;
+        gap: 20px;
     }
 
     .button-group {

@@ -1309,7 +1309,7 @@
 
         .button-group-left {
             display: flex;
-            gap: 40px;
+            gap: 30px;
         }
 
         .btn-close1 {
