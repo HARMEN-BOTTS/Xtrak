@@ -321,8 +321,8 @@ class Index extends Component
             mkdir($tempImageDir, 0777, true);
         }
 
-        $sofficePath = '"C:\\Program Files\\LibreOffice\\program\\soffice.exe"';
-        $command = $sofficePath . ' --headless --convert-to html --outdir ' . escapeshellarg($outputDir) . ' ' . escapeshellarg($inputPath);
+        // $sofficePath = '"C:\\Program Files\\LibreOffice\\program\\soffice.exe"';
+        $command = "HOME=/tmp /usr/bin/libreoffice" . ' --headless --convert-to html --outdir ' . escapeshellarg($outputDir) . ' ' . escapeshellarg($inputPath);
         exec($command . ' 2>&1', $output, $returnCode);
 
         $possibleFiles = glob($outputDir . '/' . $filename . '*.htm*');
